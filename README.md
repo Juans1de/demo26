@@ -11,6 +11,8 @@ echo -e "BOOTPROTO=dhcp\nCONFIG_IPV4=yes\nDISABLED=no\nTYPE=eth" > /etc/net/ifac
 echo 172.16.1.1/28 > /etc/net/ifaces/ens21/ipv4address
 echo 172.16.2.1/28 > /etc/net/ifaces/ens22/ipv4address
 echo nameserver 8.8.8.8 > /etc/resosl.conf
+sed -i 's/^net.ipv4.ip_forward =.*/net.ipv4.ip_forward = 1' /etc/net/sysctl.conf
 systemctl restart network
 ip -c a
+apt-get update && apt-get install chrony iptables nginx -y
 </details>
