@@ -143,7 +143,7 @@ int int0
 connect port te0 service-instance te0/int0
 exit
 int int1
-description "to br-srvv"
+description "to br-srv"
 ip address 192.168.3.1/28
 ip nat inside
 exit
@@ -196,9 +196,7 @@ echo nameserver 8.8.8.8 > /etc/resosl.conf
 systemctl restart network
 ip -c a
 useradd remote_user -u 2026
-passwd remote_user
-P@ssw0rd
-P@ssw0rd
+echo "remote_user:P@ssw0rd" | chpasswd
 sed -i 's/# WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/g' visudo
 gpasswd -a "remote_user" wheel
 sed -i 's/#Port 22/Port 2026\nAllowUsers remote_user\nMaxAuthTries 2\nPasswordAuthentication yes\nBanner /etc/openssh/banner/g' /etc/openssh/sshd_config
