@@ -123,3 +123,66 @@ ntp timezone utc+5
 ntp server 172.16.1.1
 write
 </details>
+
+<details>
+<summary> - BR-RTR </summary>
+en
+conf t
+hostname br-rtr
+ip domain-name au-team.irpo
+int int0
+description "to isp"
+ip address 172.16.2.5/28
+ip nat outside
+exit
+port te0
+service-instance te0/int0
+encapsulation untagged
+exit
+exit
+int int0
+connect port te0 service-instance te0/int0
+exit
+int int1
+description "to br-srvv"
+ip address 192.168.3.1/28
+ip nat inside
+exit
+port te1
+service-instance te1/int1
+encapsulation untagged
+exit
+exit
+int int1
+connect port te1 service-instance te1/int1
+exit
+ip route 0.0.0.0 0.0.0.0 172.16.2.1
+write
+username net_admin
+password P@ssw0rd
+role admin
+exit
+int tunnel.0
+ip address 172.16.0.2/30
+ip mtu 1400
+ip tunnel 172.16.2.5 172.16.1.4 mode gre
+ip ospf authentication-key ecorouter
+exit
+router ospf 1
+net 172.16.0.0/30 ar 0
+net 192.168.3.0/28 ar 0
+passive-interface default
+no passive-interface tunnel.0
+ar 0 auth
+exit
+write
+ip name-server 8.8.8.8
+ip nat pool NAT_POOL 192.168.3.1-192.168.3.254
+ip nat source dynamic inside-to-outside pool NAT_POOL overload int int0
+exit
+ping -c 2 ya.ru
+conf t
+ntp timezone utc+5
+ntp server 172.16.2.1
+write
+</details>
