@@ -10,7 +10,7 @@ cp /etc/net/ifaces/ens20/options /etc/net/ifaces/ens22/options
 echo -e "BOOTPROTO=dhcp\nCONFIG_IPV4=yes\nDISABLED=no\nTYPE=eth" > /etc/net/ifaces/ens20/options
 echo 172.16.1.1/28 > /etc/net/ifaces/ens21/ipv4address
 echo 172.16.2.1/28 > /etc/net/ifaces/ens22/ipv4address
-echo nameserver 8.8.8.8 > /etc/resosl.conf
+echo nameserver 8.8.8.8 > /etc/resolv.conf
 sed -i 's/net.ipv4.ip_forward = 0/net.ipv4.ip_forward = 1/g' /etc/net/sysctl.conf
 sysctl -p
 systemctl restart network
@@ -192,7 +192,7 @@ mkdir /etc/net/ifaces/ens20
 echo -e "BOOTPROTO=static\nCONFIG_IPV4=yes\nDISABLED=no\nTYPE=eth" > /etc/net/ifaces/ens20/options
 echo 192.168.1.10/27 > /etc/net/ifaces/ens20/ipv4address
 echo default via 192.168.1.1 > /etc/net/ifaces/ens20/ipv4route
-echo nameserver 8.8.8.8 > /etc/resosl.conf
+echo nameserver 8.8.8.8 > /etc/resolv.conf
 systemctl restart network
 ip -c a
 useradd remote_user -u 2026
