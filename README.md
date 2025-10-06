@@ -122,6 +122,4 @@ exit
 ntp timezone utc+5
 ntp server 172.16.1.1
 write
-exit
-show ntp timezone
 </details>
