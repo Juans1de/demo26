@@ -27,6 +27,8 @@ timedatectl
 
 <details>
 <summary> - HQ-RTR </summary>
+en
+conf t
 hostname hq-rtr
 ip domain-name au-team.irpo
 int int 0
