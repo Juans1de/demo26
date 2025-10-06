@@ -31,7 +31,7 @@ en
 conf t
 hostname hq-rtr
 ip domain-name au-team.irpo
-int int 0
+int int0
 description "to isp"
 ip address 172.16.1.4/28
 ip nat outside
