@@ -197,9 +197,9 @@ systemctl restart network
 ip -c a
 useradd remote_user -u 2026
 echo "remote_user:P@ssw0rd" | chpasswd
-sed -i 's/# WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
+sed -i 's/# WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers.d
 gpasswd -a "remote_user" wheel
-sed -i 's/#Port 22/Port 2026\nAllowUsers remote_user\nMaxAuthTries 2\nPasswordAuthentication yes\nBanner /etc/openssh/banner/g' /etc/openssh/sshd_config
+echo -e "Port 2026\nAllowUsers remote_user\nMaxAuthTries 2\nPasswordAuthentication yes\nBanner /etc/openssh/banner" >> /etc/openssh/sshd_config
 echo Authorized access only > /etc/openssh/banner
 systemctl restart sshd
 apt-get update && apt-get install chrony nfs-server fdisk dnsmasq -y
