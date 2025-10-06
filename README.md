@@ -45,7 +45,7 @@ int int0
 connect port te0 service-instance te0/int0
 exit
 int int1
-descriptions "to hq-srv"
+description "to hq-srv"
 ip address 192.168.1.1/27
 ip nat inside
 exit
@@ -79,7 +79,7 @@ int int2
 connect port te1 service-instance te1/int2
 exit
 int int3
-connect port te1 service-instance te1/in3
+connect port te1 service-instance te1/int3
 exit
 ip route 0.0.0.0 0.0.0.0 172.16.1.1
 write
@@ -105,7 +105,9 @@ write
 ip name-server 8.8.8.8
 ip nat pool NAT_POOL 192.168.1.1-192.168.1.254,192.168.2.1-192.168.2.254
 ip nat source dynamic inside-to-outside pool NAT_POOL overload int int0
+exit
 ping -c 2 ya.ru
+conf t
 ip pool cli_pool 192.168.2.10-192.168.2.10
 dhcp-server 1
 pool cli_pool 1
@@ -120,5 +122,6 @@ exit
 ntp timezone utc+5
 ntp server 172.16.1.1
 write
+exit
 show ntp timezone
 </details>
