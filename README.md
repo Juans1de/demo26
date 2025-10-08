@@ -1,5 +1,5 @@
 # Module 1 (Demo26)
-## Команды для выполнения Модуля 1 - Демоэкзамен 2026. 
+## Команды для выполнения Модуля 1 - Демо-экзамен 2026 
 <details>
 <summary> - ISP  </summary>
 hostnamectl set-hostname ISP
