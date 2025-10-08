@@ -1,5 +1,5 @@
 # Demo 2026 (M1 & M2)
-## Команды для выполнения Модуля 1 - Демо-экзамен 2026 
+## Модуль №1 - Команды для ВМ
 <details>
 <summary> - ISP  </summary>
 hostnamectl set-hostname ISP
