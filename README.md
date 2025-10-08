@@ -1,4 +1,4 @@
-# Module 1
+# Demo 2026 (M1 & M2)
 ## Команды для выполнения Модуля 1 - Демо-экзамен 2026 
 <details>
 <summary> - ISP  </summary>
