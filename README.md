@@ -1,7 +1,7 @@
 # Demo 2026 (M1 & M2)
 ## Модуль №1 - Команды для ВМ
 <details>
-<summary> - ISP  </summary>
+<summary> - ISP </summary>
 hostnamectl set-hostname ISP
 mkdir /etc/net/ifaces/{ens20,ens21,ens22}
 echo -e "BOOTPROTO=static\nCONFIG_IPV4=yes\nDISABLED=no\nTYPE=eth" > /etc/net/ifaces/ens20/options
@@ -124,7 +124,7 @@ show run
 </details>
 
 <details>
-<summary> - HQ-SRV  </summary>
+<summary> - HQ-SRV </summary>
 hostnamectl set-hostname hq-srv.au-team.irpo
 mkdir /etc/net/ifaces/ens20
 echo -e "BOOTPROTO=static\nCONFIG_IPV4=yes\nDISABLED=no\nTYPE=eth" > /etc/net/ifaces/ens20/options
@@ -133,11 +133,11 @@ echo default via 192.168.1.1 > /etc/net/ifaces/ens20/ipv4route
 echo nameserver 8.8.8.8 > /etc/resolv.conf
 systemctl restart network
 ip -c a
-useradd remote_user -u 2026
-echo "remote_user:P@ssw0rd" | chpasswd
+useradd sshuser -u 2026
+echo "sshuser:P@ssw0rd" | chpasswd
 sed -i 's/# WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
-gpasswd -a "remote_user" wheel
-sed -i 's/#Port 22/Port 2026\nAllowUsers remote_user\nMaxAuthTries 2\nPasswordAuthentication yes\nBanner \/etc\/openssh\/banner/' /etc/openssh/sshd_config
+gpasswd -a "sshuser" wheel
+sed -i 's/#Port 22/Port 2026\nAllowUsers sshuser\nMaxAuthTries 2\nPasswordAuthentication yes\nBanner \/etc\/openssh\/banner/' /etc/openssh/sshd_config
 echo Authorized access only > /etc/openssh/banner
 systemctl restart sshd
 apt-get update && apt-get install chrony nfs-server fdisk dnsmasq -y
@@ -158,11 +158,11 @@ echo default via 192.168.2.1 > /etc/net/ifaces/ens20/ipv4route
 echo nameserver 8.8.8.8 > /etc/resolv.conf
 systemctl restart network
 ip -c a
-useradd remote_user -u 2026
-echo "remote_user:P@ssw0rd" | chpasswd
+useradd sshuser -u 2026
+echo "sshuser:P@ssw0rd" | chpasswd
 sed -i 's/# WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
-gpasswd -a "remote_user" wheel
-sed -i 's/#Port 22/Port 2026\nAllowUsers remote_user\nMaxAuthTries 2\nPasswordAuthentication yes\nBanner \/etc\/openssh\/banner/' /etc/openssh/sshd_config
+gpasswd -a "sshuser" wheel
+sed -i 's/#Port 22/Port 2026\nAllowUsers sshuser\nMaxAuthTries 2\nPasswordAuthentication yes\nBanner \/etc\/openssh\/banner/' /etc/openssh/sshd_config
 echo Authorized access only > /etc/openssh/banner
 systemctl restart sshd
 apt-get update && apt-get install chrony nfs-clients admc  -y
@@ -237,7 +237,7 @@ show run
 </details>
 
 <details>
-<summary> - BR-SRV  </summary>
+<summary> - BR-SRV </summary>
 hostnamectl set-hostname br-srv.au-team.irpo
 mkdir /etc/net/ifaces/ens20
 echo -e "BOOTPROTO=static\nCONFIG_IPV4=yes\nDISABLED=no\nTYPE=eth" > /etc/net/ifaces/ens20/options
@@ -246,14 +246,39 @@ echo default via 192.168.3.1 > /etc/net/ifaces/ens20/ipv4route
 echo nameserver 8.8.8.8 > /etc/resolv.conf
 systemctl restart network
 ip -c a
-useradd remote_user -u 2026
-echo "remote_user:P@ssw0rd" | chpasswd
+useradd sshuser -u 2026
+echo "sshuser:P@ssw0rd" | chpasswd
 sed -i 's/# WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
-gpasswd -a "remote_user" wheel
-sed -i 's/#Port 22/Port 2026\nAllowUsers remote_user\nMaxAuthTries 2\nPasswordAuthentication yes\nBanner \/etc\/openssh\/banner/' /etc/openssh/sshd_config
+gpasswd -a "sshuser" wheel
+sed -i 's/#Port 22/Port 2026\nAllowUsers sshuser\nMaxAuthTries 2\nPasswordAuthentication yes\nBanner \/etc\/openssh\/banner/' /etc/openssh/sshd_config
 echo Authorized access only > /etc/openssh/banner
 systemctl restart sshd
 apt-get update && apt-get install chrony docker-compose docker-engine ansible task-samba-dc  -y
 timedatectl set-timezone Asia/Yekaterinburg
 timedatectl
+</details>
+
+## Модуль №2 - Команды для ВМ
+<details> 
+<summary> - BR-SRV </summary>
+echo nameserver 192.168.1.10 > /etc/resolv.conf
+rm -rf /etc/samba/smb.conf
+echo 192.168.3.10  br-srv.au-team.irpo >> /etc/hosts
+ ---
+printf '\n\n\n\n\nP@ssw0rd\nP@ssword\n' | sudo samba-tool domain provision
+ ---
+mv -f /var/lib/samba/private/krb5.conf /etc/krb5.conf
+systemctl enable --now samba
+samba-tool user add hquser1 P@ssw0rd
+samba-tool user add hquser2 P@ssw0rd
+samba-tool user add hquser3 P@ssw0rd
+samba-tool user add hquser4 P@ssw0rd
+samba-tool user add hquser5 P@ssw0rd
+samba-tool group add hq
+samba-tool group addmembers hq hquser1,hquser2,hquser3,hquser4,hquser5
+apt-repo add rpm http://alrepo.ru/local-p10 noarch local-p10
+apt-get update && apt-get install sudo-samba-schema -y
+---
+sudo-schema-apply
+---
 </details>
