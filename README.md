@@ -279,6 +279,6 @@ samba-tool group addmembers hq hquser1,hquser2,hquser3,hquser4,hquser5
 apt-repo add rpm http://alrepo.ru/local-p10 noarch local-p10
 apt-get update && apt-get install sudo-samba-schema -y
 ---
-sudo-schema-apply
+printf "P@ssw0rd\n" | sudo-schema-apply --rule-name="prava.hq" --sudo-command="/bin/cat" --sudo-user="%hq" --stdin-pass
 ---
 </details>
