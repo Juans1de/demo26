@@ -258,14 +258,14 @@ timedatectl set-timezone Asia/Yekaterinburg
 timedatectl
 </details>
 
-## Модуль №2 - Команды для ВМ
+## Модуль №2 - Команды для ВМ (ПРИОСТАНОВЛЕНО)
 <details> 
-<summary> - BR-SRV </summary>
+<summary> - BR-SRV [SAMBA В ПРОЦЕССЕ] </summary>
 echo nameserver 192.168.1.10 > /etc/resolv.conf
 rm -rf /etc/samba/smb.conf
 echo 192.168.3.10  br-srv.au-team.irpo >> /etc/hosts
  ---
-printf '\n\n\n\n\nP@ssw0rd\nP@ssword\n' | sudo samba-tool domain provision
+ echo '\n\n\n\n\nP@ssw0rd\nP@ssword\n' | sudo samba-tool domain provision
  ---
 mv -f /var/lib/samba/private/krb5.conf /etc/krb5.conf
 systemctl enable --now samba
@@ -281,4 +281,103 @@ apt-get update && apt-get install sudo-samba-schema -y
 ---
 printf "P@ssw0rd\n" | sudo-schema-apply --rule-name="prava.hq" --sudo-command="/bin/cat" --sudo-user="%hq" --stdin-pass
 ---
+</details>
+
+## Модуль №2 - Команды для ВМ (Без SAMBA)
+<details>
+<summary> - ISP </summary>
+echo -e "server 127.0.0.1 iburst prefer\n\thwtimestamp *\n\tlocal stratum 5\n\tallow 0/0" > /etc/chrony.conf
+systemctl enable --now chronyd
+systemctl restart chronyd
+chronyc sources
+chronyc tracking | grep Stratum
+htpasswd -bc /etc/nginx/.htpasswd WEB P@ssw0rd
+echo -e "server {\n\tlisten 80;\n\tserver_name web.au-team.irpo;\n\tauth_basic "Restricted Access";\n\tauth_basic_user_file /etc/nginx/.htpasswd;\n\tlocation / {\n\t\tproxy_pass http://172.16.1.4:8080;\n\t\tproxy_set_header Host $host;\n\t\tproxy_set_header X-Real-IP $remote_addr;\n\t}\n}\nserver {\n\tlisten 80;\n\tserver_name docker.au-team.irpo;\n\tlocation / {\n\t\tproxy_pass http://172.16.2.5:8080;\n\t\tproxy_set_header Host $host;\n\t\tproxy_set_header X-Real-IP $remote_addr;\n\t}\n}" > /etc/nginx/sites-available/proxy.conf
+ln -s /etc/nginx/sites-available.d/proxy.conf /etc/nginx/sites-enabled.d/
+mv /etc/nginx/sites-available.d/default.conf /root/
+systemctl enable --now nginx
+systemctl restart nginx
+</details>
+
+<details>
+<summary> - HQ-RTR </summary>
+ip nat source static tcp 192.168.1.10 80 172.16.1.4 8080
+ip nat source static tcp 192.168.1.10 2026 172.16.1.4 2026
+write
+</details>
+
+<details>
+<summary> - HQ-SRV </summary>
+lsblk
+mdadm --create /dev/md0 --level=0 --raid-devices=2 /dev/sd[b-c]
+mdadm --detail -scan --verbose > /etc/mdadm.conf
+echo -e "n\n\n\n\n\nw\n" | fdisk /dev/md0
+echo -e "/dev/md0p1\t/raid\text4\tdefaults\t0\t0" >> /etc/fstab
+mkdir /raid
+mount -a
+mkdir /raid/nfs
+chown 99:99 /raid/nfs
+chmod 777 /raid/nfs
+echo "/raid/nfs 192.168.2.0/28(rw,sync,no_subtree_check)" >> /etc/exports
+exportfs -a
+exportfs -v
+systemctl enable --now nfs
+systemctl restart nfs
+echo server 172.16.1.1 iburst prefer > /etc/chrony.conf
+systemctl enable --now chronyd
+systemctl restart chronyd
+timedatectl
+apt-get update
+apt-get install -y apache2 php8.2 apache2-mod_php8.2 mariadb-server php8.2-{opcache,curl,gd,intl,mysqli,xml,xmlrpc,ldap,zip,soap,mbstring,json,xmlreader,fileinfo,sodium}
+mount -o loop /dev/sr0
+systemctl enable --now httpd2 mysqld
+echo -e "\nn\ny\nP@ssw0rd\nP@ssw0rd\ny\ny\ny\ny" | mysql_secure_installation
+mariadb -u root -pP@ssw0rd
+CREATE DATABASE webdb;
+CREATE USER 'webc'@'localhost' IDENTIFIEDY BY 'P@ssw0rd';
+GRANT ALL PRIVILEGES BY webdb.* TO 'webc'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
+iconv -f UTF-16LE -t UTF-8 /media/ALTLinux/web/dump.sql > /tmp/dump_utf8.sql
+mariadb -u root -pP@ssw0rd webdb < /tmp/dump_utf8.sql
+chmod 777 /var/www/html
+cp /media/ALTLinux/web/index.php /var/www/html
+cp /media/ALTLinux/web/logo.png /var/www/html
+rm -f /var/www/html/index.html
+chown apache2:apache2 /var/www/html
+systemctl restart httpd2
+sed -i 's/$username = "user";/$username = "webc";/g' /var/www/html/index.php
+sed -i 's/$password = "password";/$password = "P@ssw0rd";/g' /var/www/html/index.php
+sed -i 's/$dbname = "db";/$dbname = "webdb";/g' /var/www/html/index.php
+</details>
+
+<details>
+<summary> - HQ-CLI </summary>
+mkdir -p /mnt/nfs
+echo 192.168.1.10:/raid/nfs\t/mnt/nfs\tnfs\tintr,soft,_netdev,x-systemd.automount\t0\t0 >> /etc/fstab
+mount -a
+mount -v
+touch /mnt/nfs
+echo server 172.16.1.1 iburst prefer > /etc/chrony.conf
+systemctl enable --now chronyd
+systemctl restart chronyd
+timedatectl
+apt-get install yandex-browser -y
+</details>
+
+<details>
+<summary> - BR-RTR </summary>
+ip nat source static tcp 192.168.3.10 8080 172.16.2.5 8080
+ip nat source static tcp 192.168.3.10 2026 172.16.2.5 2026
+write
+</details>
+
+<details>
+<summary> - BR-SRV </summary>
+echo server 172.16.2.1 iburst prefer > /etc/chrony.conf
+systemctl enable --now chronyd
+systemctl restart chronyd
+timedatectl
+echo -e "VMs:\n hosts:\n  HQ-SRV:\n    ansible_host: 192.168.1.10\n    ansible_user: sshuser\n    ansible_port: 2026\n  HQ-CLI:\n    ansible_host: 192.168.2.10\n    ansible_user: sshuser\n    ansible_port: 2026\n  HQ-RTR:\n    ansible_host: 192.168.1.1\n    ansible_user: net_admin\n    ansible_password: P@ssw0rd\n    ansible_connection: network_cli\n    ansible_network_os: ios\n  BR-RTR:\n    ansible_host: 192.168.3.1\n    ansible_user: net_admin\n    ansible_password: P@ssw0rd\n    ansible_connection: network_cli\n    ansible_network_os: ios" > /etc/ansible/hosts
+[! ОСТАНОВИЛСЯ НА ansible.cfg !]
 </details>
