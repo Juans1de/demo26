@@ -265,7 +265,7 @@ echo nameserver 192.168.1.10 > /etc/resolv.conf
 rm -rf /etc/samba/smb.conf
 echo 192.168.3.10  br-srv.au-team.irpo >> /etc/hosts
  ---
- echo '\n\n\n\n\nP@ssw0rd\nP@ssword\n' | sudo samba-tool domain provision
+ echo -e "\n\n\n\n\nP@ssw0rd\nP@ssword\n" | sudo samba-tool domain provision
  ---
 mv -f /var/lib/samba/private/krb5.conf /etc/krb5.conf
 systemctl enable --now samba
@@ -278,7 +278,7 @@ samba-tool group add hq
 samba-tool group addmembers hq hquser1,hquser2,hquser3,hquser4,hquser5
 apt-repo add rpm http://alrepo.ru/local-p10 noarch local-p10
 apt-get update && apt-get install sudo-samba-schema -y
----
+--- Проверить!
 printf "P@ssw0rd\n" | sudo-schema-apply --rule-name="prava.hq" --sudo-command="/bin/cat" --sudo-user="%hq" --stdin-pass
 ---
 </details>
@@ -379,5 +379,17 @@ systemctl enable --now chronyd
 systemctl restart chronyd
 timedatectl
 echo -e "VMs:\n hosts:\n  HQ-SRV:\n    ansible_host: 192.168.1.10\n    ansible_user: sshuser\n    ansible_port: 2026\n  HQ-CLI:\n    ansible_host: 192.168.2.10\n    ansible_user: sshuser\n    ansible_port: 2026\n  HQ-RTR:\n    ansible_host: 192.168.1.1\n    ansible_user: net_admin\n    ansible_password: P@ssw0rd\n    ansible_connection: network_cli\n    ansible_network_os: ios\n  BR-RTR:\n    ansible_host: 192.168.3.1\n    ansible_user: net_admin\n    ansible_password: P@ssw0rd\n    ansible_connection: network_cli\n    ansible_network_os: ios" > /etc/ansible/hosts
-[! ОСТАНОВИЛСЯ НА ansible.cfg !]
+sed -i 's/[defaults]/[defaults]\ninterpreter_python=auto_silent/g' /etc/ansible/ansible.cfg
+--- Проверить!
+echo -e "\n\n\n\n\n" | ssh-keygen -t rsa
+---
+---
+echo "P@ssw0rd" | ssh-copy-id -p 2026 remote_user@192.168.1.10
+echo "P@ssw0rd" | ssh-copy-id -p 2026 remote_user@192.168.2.10
+ansible all -m ping
+systemctl enable --now docker
+mount -o loop /dev/sr0
+docker load < /media/ALTLinux/docker/site_latest.tar && docker load < /media/ALTLinux/docker/mariadb_latest.tar
+docker images
+[ОСТАНОВИЛСЯ НА SITE.YML!]
 </details>
