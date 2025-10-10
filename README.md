@@ -264,9 +264,9 @@ timedatectl
 echo nameserver 192.168.1.10 > /etc/resolv.conf
 rm -rf /etc/samba/smb.conf
 echo 192.168.3.10  br-srv.au-team.irpo >> /etc/hosts
- ---
- echo -e "\n\n\n\n\nP@ssw0rd\nP@ssword\n" | sudo samba-tool domain provision
- ---
+
+echo -e "\n\n\n\n\nP@ssw0rd\nP@ssword\n" | sudo samba-tool domain provision
+
 mv -f /var/lib/samba/private/krb5.conf /etc/krb5.conf
 systemctl enable --now samba
 samba-tool user add hquser1 P@ssw0rd
@@ -278,9 +278,9 @@ samba-tool group add hq
 samba-tool group addmembers hq hquser1,hquser2,hquser3,hquser4,hquser5
 apt-repo add rpm http://alrepo.ru/local-p10 noarch local-p10
 apt-get update && apt-get install sudo-samba-schema -y
---- Проверить!
+
 printf "P@ssw0rd\n" | sudo-schema-apply --rule-name="prava.hq" --sudo-command="/bin/cat" --sudo-user="%hq" --stdin-pass
----
+
 </details>
 
 ## Модуль №2 - Команды для ВМ (Без SAMBA)
@@ -353,6 +353,9 @@ sed -i 's/$dbname = "db";/$dbname = "webdb";/g' /var/www/html/index.php
 
 <details>
 <summary> - HQ-CLI </summary>
+
+SAMBA
+
 mkdir -p /mnt/nfs
 echo 192.168.1.10:/raid/nfs\t/mnt/nfs\tnfs\tintr,soft,_netdev,x-systemd.automount\t0\t0 >> /etc/fstab
 mount -a
@@ -380,10 +383,9 @@ systemctl restart chronyd
 timedatectl
 echo -e "VMs:\n hosts:\n  HQ-SRV:\n    ansible_host: 192.168.1.10\n    ansible_user: sshuser\n    ansible_port: 2026\n  HQ-CLI:\n    ansible_host: 192.168.2.10\n    ansible_user: sshuser\n    ansible_port: 2026\n  HQ-RTR:\n    ansible_host: 192.168.1.1\n    ansible_user: net_admin\n    ansible_password: P@ssw0rd\n    ansible_connection: network_cli\n    ansible_network_os: ios\n  BR-RTR:\n    ansible_host: 192.168.3.1\n    ansible_user: net_admin\n    ansible_password: P@ssw0rd\n    ansible_connection: network_cli\n    ansible_network_os: ios" > /etc/ansible/hosts
 sed -i 's/[defaults]/[defaults]\ninterpreter_python=auto_silent/g' /etc/ansible/ansible.cfg
---- Проверить!
+
 echo -e "\n\n\n\n\n" | ssh-keygen -t rsa
----
----
+
 echo "P@ssw0rd" | ssh-copy-id -p 2026 remote_user@192.168.1.10
 echo "P@ssw0rd" | ssh-copy-id -p 2026 remote_user@192.168.2.10
 ansible all -m ping
@@ -391,5 +393,9 @@ systemctl enable --now docker
 mount -o loop /dev/sr0
 docker load < /media/ALTLinux/docker/site_latest.tar && docker load < /media/ALTLinux/docker/mariadb_latest.tar
 docker images
-[ОСТАНОВИЛСЯ НА SITE.YML!]
+echo -e 'services:\n  db:\n    image: mariadb\n    container_name: db\n    environment:\n      MYSQL_ROOT_PASSWORD: Passw0rd\n      MYSQL_DATABASE: testdb\n      MYSQL_USER: test\n      MYSQL_PASSWORD: Passw0rd\n    volumes:\n      - db_data:/var/lib/mysql\n    restart: always\n  testapp:\n    image: site\n    container_name: testapp\n    environment:\n      DB_TYPE: maria\n      DB_HOST: db\n      DB_NAME: testdb\n      DB_USER: test\n      DB_PASS: Passw0rd\n      DB_PORT: 3306\n    ports:\n      - "8080:8000"\n    restart: always\nvolumes:\n  db_data:' > site.yml
+docker compose -f site.yml up -d
+docker exec -it db mysql -u root -pPassw0rd -e "CREATE DATABASE testdb; CREATE USER 'test'@'%' IDENTIFIED BY 'Passw0rd'; GRANT ALL PRIVILEGES ON testdb.* TO 'test'@'%'; FLUSH PRIVILEGES;"
+docker compose restart
+ip -c a
 </details>
