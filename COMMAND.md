@@ -281,6 +281,20 @@ P@ssw0rd
 P@ssw0rd
 EOF
 
+cat << 'EOF' | sudo sudo-schema-apply --schema-file /dev/stdin --password P@ssw0rd
+<?xml version="1.0" encoding="UTF-8"?>
+<schema>
+  <policy>
+    <name>prava.hq</name>
+    <sudoEntry>
+      <sudoUser>%hq</sudoUser>
+      <sudoHost>ALL</sudoHost>
+      <sudoCommand>/bin/cat</sudoCommand>
+    </sudoEntry>
+  </policy>
+</schema>
+EOF
+
 (Не работает команда)
 echo -e 'P@ssw0rd\n' | create-sudo-rule --rule-name="prava.hq" --sudo-command="/bin/cat" --sudo-user="%hq" --stdin-pass
 
