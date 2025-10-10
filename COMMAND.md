@@ -2,6 +2,8 @@
 ## Модуль №1 - Команды для ВМ
 <details>
 <summary> - ISP </summary>
+
+```bash
 hostnamectl set-hostname ISP
 mkdir /etc/net/ifaces/{ens20,ens21,ens22}
 echo -e "BOOTPROTO=static\nCONFIG_IPV4=yes\nDISABLED=no\nTYPE=eth" > /etc/net/ifaces/ens20/options
@@ -23,10 +25,13 @@ systemctl restart iptables
 apt-get update && apt-get reinstall tzdata
 timedatectl set-timezone Asia/Yekaterinburg
 timedatectl
+```
 </details>
 
 <details>
 <summary> - HQ-RTR </summary>
+
+```bash
 en
 conf t
 hostname hq-rtr
@@ -121,10 +126,13 @@ ntp server 172.16.1.1
 write
 exit
 show run
+```
 </details>
 
 <details>
 <summary> - HQ-SRV </summary>
+
+```bash
 hostnamectl set-hostname hq-srv.au-team.irpo
 mkdir /etc/net/ifaces/ens20
 echo -e "BOOTPROTO=static\nCONFIG_IPV4=yes\nDISABLED=no\nTYPE=eth" > /etc/net/ifaces/ens20/options
@@ -146,10 +154,13 @@ systemctl enable --now dnsmasq
 echo -e "no-resolv\ndomain=au-team.irpo\nserver=8.8.8.8\ninterface=ens20\naddress=/hq-rtr.au-team.irpo/192.168.1.1\nptr-record=1.1.168.192.in-addr.arpa,hq-rtr.au-team.irpo\naddress=/docker.au-team.irpo/172.16.1.1\naddress=/web.au-team.irpo/172.16.2.1\naddress=/hq-srv.au-team.irpo/192.168.1.10\nptr-record=10.1.168.192.in-addr.arpa,hq-srv.au-team.irpo\naddress=/hq-cli.au-team.irpo/192.168.2.10\nptr-record=10.2.168.192.in-addr.arpa,hq-cli.au-team.irpo\naddress=/br-rtr.au-team.irpo/192.168.3.1\naddress=/br-srv.au-team.irpo/192.168.3.10" | sudo tee -a /etc/dnsmasq.conf
 echo -e "192.168.1.1  hq-rtr.au-team.irpo" >> /etc/hosts
 systemctl restart dnsmasq
+```
 </details>
 
 <details>
 <summary> - HQ-CLI  </summary>
+
+```bash
 hostnamectl set-hostname hq-cli.au-team.irpo
 mkdir /etc/net/ifaces/ens20
 echo -e "BOOTPROTO=static\nCONFIG_IPV4=yes\nDISABLED=no\nTYPE=eth" > /etc/net/ifaces/ens20/options
@@ -172,10 +183,13 @@ rm -rf /etc/net/ifaces/ens20/{ipv4address,ipv4route}
 echo -e "BOOTPROTO=dhcp\nCONFIG_IPV4=yes\nDISABLED=no\nTYPE=eth" > /etc/net/ifaces/ens20/options
 systemctl restart network
 ip -c a
+```
 </details>
 
 <details>
 <summary> - BR-RTR </summary>
+
+```bash
 en
 conf t
 hostname br-rtr
@@ -234,10 +248,13 @@ ntp server 172.16.2.1
 write
 exit
 show run
+```
 </details>
 
 <details>
 <summary> - BR-SRV </summary>
+
+```bash
 hostnamectl set-hostname br-srv.au-team.irpo
 mkdir /etc/net/ifaces/ens20
 echo -e "BOOTPROTO=static\nCONFIG_IPV4=yes\nDISABLED=no\nTYPE=eth" > /etc/net/ifaces/ens20/options
@@ -256,11 +273,14 @@ systemctl restart sshd
 apt-get update && apt-get install chrony docker-compose docker-engine ansible task-samba-dc  -y
 timedatectl set-timezone Asia/Yekaterinburg
 timedatectl
+```
 </details>
 
 ## Модуль №2 - Команды для ВМ (ПРИОСТАНОВЛЕНО)
 <details> 
 <summary> - BR-SRV [SAMBA В ПРОЦЕССЕ] </summary>
+
+```bash
 echo nameserver 192.168.1.10 > /etc/resolv.conf
 rm -rf /etc/samba/smb.conf
 echo 192.168.3.10  br-srv.au-team.irpo >> /etc/hosts
@@ -274,13 +294,21 @@ samba-tool user add hquser4 P@ssw0rd
 samba-tool user add hquser5 P@ssw0rd
 samba-tool group add hq
 samba-tool group addmembers hq hquser1,hquser2,hquser3,hquser4,hquser5
-apt-repo add rpm http://alrepo.ru/local-p10 noarch local-p10
-apt-get update && apt-get install sudo-samba-schema -y
+cp /etc/apt/sources.list.d/alt.list /etc/apt/sources.list.d/alt.list.bak
+
+sed -i 's|^rpm.*ftp\.altlinux|# &|g' /etc/apt/sources.list.d/alt.list
+cat >> /etc/apt/sources.list.d/alt.list <<EOF
+rpm http://192.168.0.91/mirror p10/branch/x86_64 classic
+rpm http://192.168.0.91/mirror p10/branch/noarch classic
+rpm http://192.168.0.91/mirror p10/branch/x86_64-586 classic
+EOF
+apt-get update
+
+apt-get install sudo-samba-schema -y
 sudo-schema-apply << EOF
 P@ssw0rd
 P@ssw0rd
 EOF
-
 cat << 'EOF' | sudo sudo-schema-apply --schema-file /dev/stdin --password P@ssw0rd
 <?xml version="1.0" encoding="UTF-8"?>
 <schema>
@@ -297,17 +325,22 @@ EOF
 
 (Не работает команда)
 echo -e 'P@ssw0rd\n' | create-sudo-rule --rule-name="prava.hq" --sudo-command="/bin/cat" --sudo-user="%hq" --stdin-pass
-
+```
 </details>
 
 <details> 
 <summary> - HQ-CLI </summary>
+
+```bash
 В процессе!
+```
 </details>
 
 ## Модуль №2 - Команды для ВМ (Без SAMBA)
 <details>
 <summary> - ISP </summary>
+
+```bash
 echo -e "server 127.0.0.1 iburst prefer\n\thwtimestamp *\n\tlocal stratum 5\n\tallow 0/0" > /etc/chrony.conf
 systemctl enable --now chronyd
 systemctl restart chronyd
@@ -319,17 +352,23 @@ ln -s /etc/nginx/sites-available.d/proxy.conf /etc/nginx/sites-enabled.d/
 mv /etc/nginx/sites-available.d/default.conf /root/
 systemctl enable --now nginx
 systemctl restart nginx
+```
 </details>
 
 <details>
 <summary> - HQ-RTR </summary>
+
+```bash
 ip nat source static tcp 192.168.1.10 80 172.16.1.4 8080
 ip nat source static tcp 192.168.1.10 2026 172.16.1.4 2026
 write
+```
 </details>
 
 <details>
 <summary> - HQ-SRV </summary>
+
+```bash
 lsblk
 mdadm --create /dev/md0 --level=0 --raid-devices=2 /dev/sd[b-c]
 mdadm --detail -scan --verbose > /etc/mdadm.conf
@@ -371,11 +410,13 @@ systemctl restart httpd2
 sed -i 's/$username = "user";/$username = "webc";/g' /var/www/html/index.php
 sed -i 's/$password = "password";/$password = "P@ssw0rd";/g' /var/www/html/index.php
 sed -i 's/$dbname = "db";/$dbname = "webdb";/g' /var/www/html/index.php
+```
 </details>
 
 <details>
 <summary> - HQ-CLI </summary>
 
+```bash
 SAMBA
 
 mkdir -p /mnt/nfs
@@ -388,17 +429,23 @@ systemctl enable --now chronyd
 systemctl restart chronyd
 timedatectl
 apt-get install yandex-browser -y
+```
 </details>
 
 <details>
 <summary> - BR-RTR </summary>
+
+```bash
 ip nat source static tcp 192.168.3.10 8080 172.16.2.5 8080
 ip nat source static tcp 192.168.3.10 2026 172.16.2.5 2026
 write
+```
 </details>
 
 <details>
 <summary> - BR-SRV </summary>
+
+```bash
 echo server 172.16.2.1 iburst prefer > /etc/chrony.conf
 systemctl enable --now chronyd
 systemctl restart chronyd
@@ -420,4 +467,5 @@ docker compose -f site.yml up -d
 docker exec -it db mysql -u root -pPassw0rd -e "CREATE DATABASE testdb; CREATE USER 'test'@'%' IDENTIFIED BY 'Passw0rd'; GRANT ALL PRIVILEGES ON testdb.* TO 'test'@'%'; FLUSH PRIVILEGES;"
 docker compose restart
 ip -c a
+```
 </details>
