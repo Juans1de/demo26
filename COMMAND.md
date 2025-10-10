@@ -264,9 +264,7 @@ timedatectl
 echo nameserver 192.168.1.10 > /etc/resolv.conf
 rm -rf /etc/samba/smb.conf
 echo 192.168.3.10  br-srv.au-team.irpo >> /etc/hosts
-
-echo -e "\n\n\n\n\nP@ssw0rd\nP@ssword\n" | sudo samba-tool domain provision
-
+samba-tool domain provision --realm=AU-TEAM.IRPO --domain=AU-TEAM --option='dns forwarder=192.168.1.10' --adminpass=P@ssw0rd --dns-backend=SAMBA_INTERNAL --server-role=dc
 mv -f /var/lib/samba/private/krb5.conf /etc/krb5.conf
 systemctl enable --now samba
 samba-tool user add hquser1 P@ssw0rd
@@ -278,9 +276,19 @@ samba-tool group add hq
 samba-tool group addmembers hq hquser1,hquser2,hquser3,hquser4,hquser5
 apt-repo add rpm http://alrepo.ru/local-p10 noarch local-p10
 apt-get update && apt-get install sudo-samba-schema -y
+sudo-schema-apply << EOF
+P@ssw0rd
+P@ssw0rd
+EOF
 
-printf "P@ssw0rd\n" | sudo-schema-apply --rule-name="prava.hq" --sudo-command="/bin/cat" --sudo-user="%hq" --stdin-pass
+(Не работает команда)
+echo -e 'P@ssw0rd\n' | create-sudo-rule --rule-name="prava.hq" --sudo-command="/bin/cat" --sudo-user="%hq" --stdin-pass
 
+</details>
+
+<details> 
+<summary> - HQ-CLI </summary>
+В процессе!
 </details>
 
 ## Модуль №2 - Команды для ВМ (Без SAMBA)
