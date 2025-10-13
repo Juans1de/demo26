@@ -481,12 +481,16 @@ sshpass -p "P@ssw0rd" ssh-copy-id -p 2222 sshuser@172.16.1.4
 ansible all -m ping
 systemctl enable --now docker
 mount -o loop /dev/sr0
-docker load < /media/ALTLinux/docker/site_latest.tar && docker load < /media/ALTLinux/docker/mariadb_latest.tar
-sleep 90
+docker load < /media/ALTLinux/docker/site_latest.tar
+sleep 2
+docker load < /media/ALTLinux/docker/mariadb_latest.tar
+sleep 2
 docker images
 echo -e 'services:\n  db:\n    image: mariadb\n    container_name: db\n    environment:\n      MYSQL_ROOT_PASSWORD: Passw0rd\n      MYSQL_DATABASE: testdb\n      MYSQL_USER: test\n      MYSQL_PASSWORD: Passw0rd\n    volumes:\n      - db_data:/var/lib/mysql\n    restart: always\n  testapp:\n    image: site\n    container_name: testapp\n    environment:\n      DB_TYPE: maria\n      DB_HOST: db\n      DB_NAME: testdb\n      DB_USER: test\n      DB_PASS: Passw0rd\n      DB_PORT: 3306\n    ports:\n      - "8080:8000"\n    restart: always\nvolumes:\n  db_data:' > site.yml
 docker compose -f site.yml up -d
+sleep 5
 docker exec -it db mysql -u root -pPassw0rd -e "CREATE DATABASE testdb; CREATE USER 'test'@'%' IDENTIFIED BY 'Passw0rd'; GRANT ALL PRIVILEGES ON testdb.* TO 'test'@'%'; FLUSH PRIVILEGES;"
+sleep 2
 docker compose restart
 ip -c a
 ```
