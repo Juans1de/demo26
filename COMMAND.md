@@ -155,6 +155,7 @@ echo -e "no-resolv\ndomain=au-team.irpo\nserver=8.8.8.8\ninterface=ens20\naddres
 echo -e "192.168.1.1  hq-rtr.au-team.irpo" >> /etc/hosts
 systemctl restart dnsmasq
 ```
+
 </details>
 
 <details>
@@ -184,6 +185,7 @@ echo -e "BOOTPROTO=dhcp\nCONFIG_IPV4=yes\nDISABLED=no\nTYPE=eth" > /etc/net/ifac
 systemctl restart network
 ip -c a
 ```
+
 </details>
 
 <details>
@@ -249,6 +251,7 @@ write
 exit
 show run
 ```
+
 </details>
 
 <details>
@@ -274,6 +277,7 @@ apt-get update && apt-get install chrony docker-compose docker-engine ansible ta
 timedatectl set-timezone Asia/Yekaterinburg
 timedatectl
 ```
+
 </details>
 
 ## Модуль №2 - Команды для ВМ (ПРИОСТАНОВЛЕНО)
@@ -326,6 +330,7 @@ EOF
 (Не работает команда)
 echo -e 'P@ssw0rd\n' | create-sudo-rule --rule-name="prava.hq" --sudo-command="/bin/cat" --sudo-user="%hq" --stdin-pass
 ```
+
 </details>
 
 <details> 
@@ -334,6 +339,7 @@ echo -e 'P@ssw0rd\n' | create-sudo-rule --rule-name="prava.hq" --sudo-command="/
 ```bash
 В процессе!
 ```
+
 </details>
 
 ## Модуль №2 - Команды для ВМ (Без SAMBA)
@@ -354,6 +360,7 @@ mv /etc/nginx/sites-available.d/default.conf /root/
 systemctl enable --now nginx
 systemctl restart nginx
 ```
+
 </details>
 
 <details>
@@ -364,6 +371,7 @@ ip nat source static tcp 192.168.1.10 80 172.16.1.4 8080
 ip nat source static tcp 192.168.1.10 2026 172.16.1.4 2026
 write
 ```
+
 </details>
 
 <details>
@@ -412,6 +420,7 @@ sed -i 's/$username = "user";/$username = "webc";/g' /var/www/html/index.php
 sed -i 's/$password = "password";/$password = "P@ssw0rd";/g' /var/www/html/index.php
 sed -i 's/$dbname = "db";/$dbname = "webdb";/g' /var/www/html/index.php
 ```
+
 </details>
 
 <details>
