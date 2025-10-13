@@ -470,7 +470,7 @@ systemctl enable --now chronyd
 systemctl restart chronyd
 timedatectl
 echo -e "VMs:\n hosts:\n  HQ-SRV:\n    ansible_host: 192.168.1.10\n    ansible_user: sshuser\n    ansible_port: 2026\n  HQ-CLI:\n    ansible_host: 192.168.2.10\n    ansible_user: sshuser\n    ansible_port: 2026\n  HQ-RTR:\n    ansible_host: 192.168.1.1\n    ansible_user: net_admin\n    ansible_password: P@ssw0rd\n    ansible_connection: network_cli\n    ansible_network_os: ios\n  BR-RTR:\n    ansible_host: 192.168.3.1\n    ansible_user: net_admin\n    ansible_password: P@ssw0rd\n    ansible_connection: network_cli\n    ansible_network_os: ios" > /etc/ansible/hosts
-sed -i 's/[defaults]/[defaults]\ninterpreter_python=auto_silent/g' /etc/ansible/ansible.cfg
+sed -i 's/\[defaults\]/\[defaults\]\ninterpreter_python=auto_silent/g' /etc/ansible/ansible.cfg
 
 echo -e "\n\n\n\n\n" | ssh-keygen -t rsa
 
