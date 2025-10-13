@@ -442,6 +442,7 @@ systemctl enable --now chronyd
 systemctl restart chronyd
 timedatectl
 apt-get install yandex-browser -y
+ip -c a
 ```
 
 </details>
