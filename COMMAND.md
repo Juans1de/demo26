@@ -149,7 +149,7 @@ sed -i 's/# WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/WHEEL_USERS ALL=(ALL:ALL) NO
 gpasswd -a "sshuser" wheel
 sed -i 's/#Port 22/Port 2026\nAllowUsers sshuser\nMaxAuthTries 2\nPasswordAuthentication yes\nBanner \/etc\/openssh\/banner/' /etc/openssh/sshd_config
 echo Authorized access only > /etc/openssh/banner
-systemctl restart sshd
+systemctl enable --now sshd
 apt-get update && apt-get install chrony nfs-server fdisk dnsmasq -y
 timedatectl set-timezone Asia/Yekaterinburg
 systemctl enable --now dnsmasq
@@ -178,7 +178,7 @@ sed -i 's/# WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/WHEEL_USERS ALL=(ALL:ALL) NO
 gpasswd -a "sshuser" wheel
 sed -i 's/#Port 22/Port 2026\nAllowUsers sshuser\nMaxAuthTries 2\nPasswordAuthentication yes\nBanner \/etc\/openssh\/banner/' /etc/openssh/sshd_config
 echo Authorized access only > /etc/openssh/banner
-systemctl restart sshd
+systemctl enable --now sshd
 apt-get update && apt-get install chrony nfs-clients admc  -y
 timedatectl set-timezone Asia/Yekaterinburg
 timedatectl
@@ -274,7 +274,7 @@ sed -i 's/# WHEEL_USERS ALL=(ALL:ALL) NOPASSWD: ALL/WHEEL_USERS ALL=(ALL:ALL) NO
 gpasswd -a "sshuser" wheel
 sed -i 's/#Port 22/Port 2026\nAllowUsers sshuser\nMaxAuthTries 2\nPasswordAuthentication yes\nBanner \/etc\/openssh\/banner/' /etc/openssh/sshd_config
 echo Authorized access only > /etc/openssh/banner
-systemctl restart sshd
+systemctl enable --now sshd
 apt-get update && apt-get install chrony docker-compose docker-engine ansible task-samba-dc  -y
 timedatectl set-timezone Asia/Yekaterinburg
 timedatectl
@@ -351,7 +351,6 @@ echo -e 'P@ssw0rd\n' | create-sudo-rule --rule-name="prava.hq" --sudo-command="/
 ```bash
 echo -e "server 127.0.0.1 iburst prefer\n\thwtimestamp *\n\tlocal stratum 5\n\tallow 0/0" > /etc/chrony.conf
 systemctl enable --now chronyd
-systemctl restart chronyd
 chronyc sources
 chronyc tracking | grep Stratum
 apt-get update && apt-get install apache2-htpasswd -y
@@ -360,7 +359,6 @@ echo -e "server {\n\tlisten 80;\n\tserver_name web.au-team.irpo;\n\tauth_basic \
 ln -s /etc/nginx/sites-available.d/proxy.conf /etc/nginx/sites-enabled.d/
 mv /etc/nginx/sites-available.d/default.conf /root/
 systemctl enable --now nginx
-systemctl restart nginx
 ```
 
 </details>
@@ -394,10 +392,8 @@ echo "/raid/nfs 192.168.2.0/28(rw,sync,no_subtree_check)" >> /etc/exports
 exportfs -a
 exportfs -v
 systemctl enable --now nfs
-systemctl restart nfs
 echo server 172.16.1.1 iburst prefer > /etc/chrony.conf
 systemctl enable --now chronyd
-systemctl restart chronyd
 timedatectl
 apt-get update
 apt-get install -y apache2 php8.2 apache2-mod_php8.2 mariadb-server php8.2-{opcache,curl,gd,intl,mysqli,xml,xmlrpc,ldap,zip,soap,mbstring,json,xmlreader,fileinfo,sodium}
@@ -442,7 +438,6 @@ mount -v
 touch /mnt/nfs
 echo server 172.16.1.1 iburst prefer > /etc/chrony.conf
 systemctl enable --now chronyd
-systemctl restart chronyd
 timedatectl
 apt-get install yandex-browser -y
 ip -c a
@@ -467,7 +462,6 @@ write
 ```bash
 echo server 172.16.2.1 iburst prefer > /etc/chrony.conf
 systemctl enable --now chronyd
-systemctl restart chronyd
 timedatectl
 echo -e "VMs:\n hosts:\n  HQ-SRV:\n    ansible_host: 192.168.1.10\n    ansible_user: sshuser\n    ansible_port: 2026\n  HQ-CLI:\n    ansible_host: 192.168.2.10\n    ansible_user: sshuser\n    ansible_port: 2026\n  HQ-RTR:\n    ansible_host: 192.168.1.1\n    ansible_user: net_admin\n    ansible_password: P@ssw0rd\n    ansible_connection: network_cli\n    ansible_network_os: ios\n  BR-RTR:\n    ansible_host: 192.168.3.1\n    ansible_user: net_admin\n    ansible_password: P@ssw0rd\n    ansible_connection: network_cli\n    ansible_network_os: ios" > /etc/ansible/hosts
 sed -i 's/\[defaults\]/\[defaults\]\ninterpreter_python=auto_silent/g' /etc/ansible/ansible.cfg
