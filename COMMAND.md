@@ -382,7 +382,7 @@ lsblk
 mdadm --create /dev/md0 --level=0 --raid-devices=2 /dev/sd[b-c]
 mdadm --detail -scan --verbose > /etc/mdadm.conf
 echo -e "n\n\n\n\n\nw\n" | fdisk /dev/md0
-echo -e "/dev/md0p1\t/raid\text4\tdefaults\t0\t0" >> /etc/fstab
+echo "/dev/md0p1 /raid ext4 defaults 0 0" >> /etc/fstab
 mkdir /raid
 mount -a
 mkdir /raid/nfs
@@ -432,7 +432,7 @@ SAMBA
 ```bash
 systemctl restart network
 mkdir -p /mnt/nfs
-echo 192.168.1.10:/raid/nfs\t/mnt/nfs\tnfs\tintr,soft,_netdev,x-systemd.automount\t0\t0 >> /etc/fstab
+echo 192.168.1.10:/raid/nfs  /mnt/nfs  nfs  intr,soft,_netdev,x-systemd.automount  0  0 >> /etc/fstab
 mount -a
 mount -v
 touch /mnt/nfs
