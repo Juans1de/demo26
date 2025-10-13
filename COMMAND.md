@@ -435,8 +435,9 @@ SAMBA
 
 ```bash
 systemctl restart network
+sleep 5
 mkdir -p /mnt/nfs
-echo "192.168.1.10:/raid/nfs\t/mnt/nfs\tnfs\tintr,soft,_netdev,x-systemd.automount\t0\t0" >> /etc/fstab
+echo "192.168.1.10:/raid/nfs /mnt/nfs nfs intr,soft,_netdev,x-systemd.automount 0 0" >> /etc/fstab
 mount -a
 mount -v
 touch /mnt/nfs
