@@ -383,11 +383,12 @@ lsblk
 mdadm --create /dev/md0 --level=0 --raid-devices=2 /dev/sd[b-c]
 mdadm --detail -scan --verbose > /etc/mdadm.conf
 echo -e "n\n\n\n\n\nw" | fdisk /dev/md0
-UUID=$(blkid -s UUID -o value /dev/md0p1)
-echo "UUID=$UUID /raid ext4 defaults 0 0" >> /etc/fstab
+cat << EOF >> /etc/fstab
+/dev/md0p1  /raid  ext4  defaults  0  0
+EOF
 mkdir /raid
-sleep 2
 mount -a
+sleep 2
 mkdir /raid/nfs
 chown 99:99 /raid/nfs
 chmod 777 /raid/nfs
