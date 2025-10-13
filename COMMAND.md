@@ -406,7 +406,7 @@ sudo mysql_secure_installation < mysql_secure_installation_answers.txt
 mariadb -u root -pP@ssw0rd
 CREATE DATABASE webdb;
 CREATE USER 'webc'@'localhost' IDENTIFIED BY 'P@ssw0rd';
-GRANT ALL PRIVILEGES BY webdb.* TO 'webc'@'localhost';
+GRANT ALL PRIVILEGES ON webdb.* TO 'webc'@'localhost';
 FLUSH PRIVILEGES;
 EXIT;
 iconv -f UTF-16LE -t UTF-8 /media/ALTLinux/web/dump.sql > /tmp/dump_utf8.sql
