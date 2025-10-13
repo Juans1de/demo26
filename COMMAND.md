@@ -21,11 +21,12 @@ apt-get update && apt-get install chrony iptables nginx -y
 iptables -t nat -A POSTROUTING -o ens20 -s 172.16.1.0/28 -j MASQUERADE
 iptables -t nat -A POSTROUTING -o ens20 -s 172.16.2.0/28 -j MASQUERADE
 iptables-save > /etc/sysconfig/iptables
-systemctl restart iptables
+systemctl enable --now iptables
 apt-get update && apt-get reinstall tzdata
 timedatectl set-timezone Asia/Yekaterinburg
 timedatectl
 ```
+
 </details>
 
 <details>
@@ -127,6 +128,7 @@ write
 exit
 show run
 ```
+
 </details>
 
 <details>
