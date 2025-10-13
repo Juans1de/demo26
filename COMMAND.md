@@ -403,7 +403,7 @@ mount -o loop /dev/sr0
 systemctl enable --now httpd2 mysqld
 echo -e "\n\ny\nP@ssw0rd\nP@ssw0rd\ny\ny\ny\ny" | mysql_secure_installation
 
-echo -e "n\ny\nP@ssw0rd\nP@ssw0rd\ny\ny\ny\ny" > mysql_secure_installation.txt
+echo -e "n\ny\nP@ssw0rd\nP@ssw0rd\ny\ny\ny\ny" > mysql_secure_installation_answers.txt
 sudo mysql_secure_installation < mysql_secure_installation_answers.txt
 
 mariadb -u root -pP@ssw0rd
