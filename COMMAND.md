@@ -471,13 +471,13 @@ write
 echo server 172.16.2.1 iburst prefer > /etc/chrony.conf
 systemctl enable --now chronyd
 timedatectl
-echo -e "VMs:\n hosts:\n  HQ-SRV:\n    ansible_host: 172.16.1.4\n    ansible_user: sshuser\n    ansible_port: 2026\n  HQ-CLI:\n    ansible_host: 172.16.1.4\n    ansible_user: sshuser\n    ansible_port: 2222\n  HQ-RTR:\n    ansible_host: 192.168.1.1\n    ansible_user: net_admin\n    ansible_password: P@ssw0rd\n    ansible_connection: network_cli\n    ansible_network_os: ios\n  BR-RTR:\n    ansible_host: 192.168.3.1\n    ansible_user: net_admin\n    ansible_password: P@ssw0rd\n    ansible_connection: network_cli\n    ansible_network_os: ios" > /etc/ansible/hosts
+echo -e "VMs:\n hosts:\n  HQ-SRV:\n    ansible_host: 192.168.1.10\n    ansible_user: sshuser\n    ansible_port: 2026\n  HQ-CLI:\n    ansible_host: 192.168.2.10\n    ansible_user: sshuser\n    ansible_port: 2026\n  HQ-RTR:\n    ansible_host: 192.168.1.1\n    ansible_user: net_admin\n    ansible_password: P@ssw0rd\n    ansible_connection: network_cli\n    ansible_network_os: ios\n  BR-RTR:\n    ansible_host: 192.168.3.1\n    ansible_user: net_admin\n    ansible_password: P@ssw0rd\n    ansible_connection: network_cli\n    ansible_network_os: ios" > /etc/ansible/hosts
 sed -i 's/\[defaults\]/\[defaults\]\ninterpreter_python=auto_silent/g' /etc/ansible/ansible.cfg
 ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ""
-grep -q "172.16.1.4:2026" ~/.ssh/known_hosts 2>/dev/null || ssh-keyscan -p 2026 172.16.1.4 >> ~/.ssh/known_hosts
-grep -q "172.16.1.4:2222" ~/.ssh/known_hosts 2>/dev/null || ssh-keyscan -p 2222 172.16.1.4 >> ~/.ssh/known_hosts
-sshpass -p "P@ssw0rd" ssh-copy-id -p 2026 sshuser@172.16.1.4
-sshpass -p "P@ssw0rd" ssh-copy-id -p 2222 sshuser@172.16.1.4
+grep -q "192.168.1.10:2026" ~/.ssh/known_hosts 2>/dev/null || ssh-keyscan -p 2026 192.168.1.10 >> ~/.ssh/known_hosts
+grep -q "192.168.2.10:2026" ~/.ssh/known_hosts 2>/dev/null || ssh-keyscan -p 2026 192.168.2.10 >> ~/.ssh/known_hosts
+sshpass -p "P@ssw0rd" ssh-copy-id -p 2026 sshuser@192.168.1.10
+sshpass -p "P@ssw0rd" ssh-copy-id -p 2026 sshuser@192.168.2.10
 ansible all -m ping
 systemctl enable --now docker
 mount -o loop /dev/sr0
