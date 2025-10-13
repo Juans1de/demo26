@@ -401,7 +401,7 @@ apt-get update
 apt-get install -y apache2 php8.2 apache2-mod_php8.2 mariadb-server php8.2-{opcache,curl,gd,intl,mysqli,xml,xmlrpc,ldap,zip,soap,mbstring,json,xmlreader,fileinfo,sodium}
 mount -o loop /dev/sr0
 systemctl enable --now httpd2 mysqld
-echo -e "\nn\ny\nP@ssw0rd\nP@ssw0rd\ny\ny\ny\ny" | mysql_secure_installation
+echo -e "\n\ny\nP@ssw0rd\nP@ssw0rd\ny\ny\ny\ny" | mysql_secure_installation
 mariadb -u root -pP@ssw0rd
 CREATE DATABASE webdb;
 CREATE USER 'webc'@'localhost' IDENTIFIEDY BY 'P@ssw0rd';
