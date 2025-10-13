@@ -419,6 +419,7 @@ systemctl restart httpd2
 sed -i 's/$username = "user";/$username = "webc";/g' /var/www/html/index.php
 sed -i 's/$password = "password";/$password = "P@ssw0rd";/g' /var/www/html/index.php
 sed -i 's/$dbname = "db";/$dbname = "webdb";/g' /var/www/html/index.php
+ip -c a
 ```
 
 </details>
