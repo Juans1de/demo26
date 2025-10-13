@@ -355,6 +355,11 @@ chronyc tracking | grep Stratum
 apt-get update && apt-get install apache2-htpasswd -y
 htpasswd -bc /etc/nginx/.htpasswd WEB P@ssw0rd
 echo -e "server {\n\tlisten 80;\n\tserver_name web.au-team.irpo;\n\tauth_basic "Restricted Access";\n\tauth_basic_user_file /etc/nginx/.htpasswd;\n\tlocation / {\n\t\tproxy_pass http://172.16.1.4:8080;\n\t\tproxy_set_header Host $host;\n\t\tproxy_set_header X-Real-IP $remote_addr;\n\t}\n}\nserver {\n\tlisten 80;\n\tserver_name docker.au-team.irpo;\n\tlocation / {\n\t\tproxy_pass http://172.16.2.5:8080;\n\t\tproxy_set_header Host $host;\n\t\tproxy_set_header X-Real-IP $remote_addr;\n\t}\n}" > /etc/nginx/sites-available.d/proxy.conf
+
+---
+echo -e "server {\n\tlisten 80;\n\tserver_name web.au-team.irpo;\n\tauth_basic \"Restricted Access\";\n\tauth_basic_user_file /etc/nginx/.htpasswd;\n\tlocation / {\n\t\tproxy_pass http://172.16.1.4:8080;\n\t\tproxy_set_header Host \$host;\n\t\tproxy_set_header X-Real-IP \$remote_addr;\n\t}\n}\nserver {\n\tlisten 80;\n\tserver_name docker.au-team.irpo;\n\tlocation / {\n\t\tproxy_pass http://172.16.2.5:8080;\n\t\tproxy_set_header Host \$host;\n\t\tproxy_set_header X-Real-IP \$remote_addr;\n\t}\n}" > /etc/nginx/sites-available.d/proxy.conf
+---
+
 ln -s /etc/nginx/sites-available.d/proxy.conf /etc/nginx/sites-enabled.d/
 mv /etc/nginx/sites-available.d/default.conf /root/
 systemctl enable --now nginx
