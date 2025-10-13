@@ -431,6 +431,7 @@ ip -c a
 SAMBA
 
 ```bash
+systemctl restart network
 mkdir -p /mnt/nfs
 echo 192.168.1.10:/raid/nfs\t/mnt/nfs\tnfs\tintr,soft,_netdev,x-systemd.automount\t0\t0 >> /etc/fstab
 mount -a
