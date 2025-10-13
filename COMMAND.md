@@ -473,9 +473,9 @@ echo -e "VMs:\n hosts:\n  HQ-SRV:\n    ansible_host: 192.168.1.10\n    ansible_u
 sed -i 's/\[defaults\]/\[defaults\]\ninterpreter_python=auto_silent/g' /etc/ansible/ansible.cfg
 ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ""
 sleep 2
-echo "P@ssw0rd" | ssh-copy-id -p 2026 remote_user@192.168.1.10
+echo "P@ssw0rd" | ssh-copy-id -p 2026 sshuser@192.168.1.10
 sleep 5
-echo "P@ssw0rd" | ssh-copy-id -p 2026 remote_user@192.168.2.10
+echo "P@ssw0rd" | ssh-copy-id -p 2026 sshuser@192.168.2.10
 sleep 5
 ansible all -m ping
 systemctl enable --now docker
