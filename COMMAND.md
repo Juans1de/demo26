@@ -351,6 +351,7 @@ echo -e 'P@ssw0rd\n' | create-sudo-rule --rule-name="prava.hq" --sudo-command="/
 ```bash
 echo -e "server 127.0.0.1 iburst prefer\n\thwtimestamp *\n\tlocal stratum 5\n\tallow 0/0" > /etc/chrony.conf
 systemctl enable --now chronyd
+systemctl restart chronyd
 chronyc sources
 chronyc tracking | grep Stratum
 apt-get update && apt-get install apache2-htpasswd -y
@@ -392,6 +393,7 @@ echo "/raid/nfs 192.168.2.0/28(rw,sync,no_subtree_check)" >> /etc/exports
 exportfs -a
 exportfs -v
 systemctl enable --now nfs
+systemctl restart nfs
 echo server 172.16.1.1 iburst prefer > /etc/chrony.conf
 systemctl enable --now chronyd
 timedatectl
@@ -438,6 +440,7 @@ mount -v
 touch /mnt/nfs
 echo server 172.16.1.1 iburst prefer > /etc/chrony.conf
 systemctl enable --now chronyd
+systemctl restart chronyd
 timedatectl
 apt-get install yandex-browser -y
 ip -c a
