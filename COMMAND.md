@@ -383,6 +383,7 @@ lsblk
 mdadm --create /dev/md0 --level=0 --raid-devices=2 /dev/sd[b-c]
 mdadm --detail -scan --verbose > /etc/mdadm.conf
 echo -e "n\n\n\n\n\nw" | fdisk /dev/md0
+mkfs.ext4 /dev/md0p1
 cat << EOF >> /etc/fstab
 /dev/md0p1  /raid  ext4  defaults  0  0
 EOF
