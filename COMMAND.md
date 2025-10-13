@@ -417,9 +417,10 @@ sed -i 's/$dbname = "db";/$dbname = "webdb";/g' /var/www/html/index.php
 <details>
 <summary> - HQ-CLI </summary>
 
-```bash
+
 SAMBA
 
+```bash
 mkdir -p /mnt/nfs
 echo 192.168.1.10:/raid/nfs\t/mnt/nfs\tnfs\tintr,soft,_netdev,x-systemd.automount\t0\t0 >> /etc/fstab
 mount -a
@@ -431,6 +432,7 @@ systemctl restart chronyd
 timedatectl
 apt-get install yandex-browser -y
 ```
+
 </details>
 
 <details>
@@ -441,6 +443,7 @@ ip nat source static tcp 192.168.3.10 8080 172.16.2.5 8080
 ip nat source static tcp 192.168.3.10 2026 172.16.2.5 2026
 write
 ```
+
 </details>
 
 <details>
@@ -469,4 +472,5 @@ docker exec -it db mysql -u root -pPassw0rd -e "CREATE DATABASE testdb; CREATE U
 docker compose restart
 ip -c a
 ```
+
 </details>
