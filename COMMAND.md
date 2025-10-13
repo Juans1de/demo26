@@ -437,7 +437,7 @@ SAMBA
 
 ```bash
 systemctl restart network
-sleep 5
+sleep 1
 mkdir -p /mnt/nfs
 echo "192.168.1.10:/raid/nfs /mnt/nfs nfs intr,soft,_netdev,x-systemd.automount 0 0" >> /etc/fstab
 mount -a
@@ -474,11 +474,11 @@ timedatectl
 echo -e "VMs:\n hosts:\n  HQ-SRV:\n    ansible_host: 192.168.1.10\n    ansible_user: sshuser\n    ansible_port: 2026\n  HQ-CLI:\n    ansible_host: 192.168.2.10\n    ansible_user: sshuser\n    ansible_port: 2026\n  HQ-RTR:\n    ansible_host: 192.168.1.1\n    ansible_user: net_admin\n    ansible_password: P@ssw0rd\n    ansible_connection: network_cli\n    ansible_network_os: ios\n  BR-RTR:\n    ansible_host: 192.168.3.1\n    ansible_user: net_admin\n    ansible_password: P@ssw0rd\n    ansible_connection: network_cli\n    ansible_network_os: ios" > /etc/ansible/hosts
 sed -i 's/\[defaults\]/\[defaults\]\ninterpreter_python=auto_silent/g' /etc/ansible/ansible.cfg
 ssh-keygen -t rsa -f ~/.ssh/id_rsa -N ""
-sleep 2
+sleep 1
 echo "P@ssw0rd" | ssh-copy-id -p 2026 sshuser@192.168.1.10
-sleep 5
+sleep 3
 echo "P@ssw0rd" | ssh-copy-id -p 2026 sshuser@192.168.2.10
-sleep 5
+sleep 3
 ansible all -m ping
 systemctl enable --now docker
 mount -o loop /dev/sr0
