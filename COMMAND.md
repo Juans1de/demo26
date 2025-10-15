@@ -302,31 +302,6 @@ exec bash
 
 </details>
 
-## Модуль №2 - Команды для ВМ (ПРИОСТАНОВЛЕНО)
-<details> 
-<summary> - HQ-CLI </summary>
-
-```bash
-systemctl restart network
-system-auth write ad AU-TEAM.IRPO cli AU-TEAM 'administrator' 'P@ssw0rd'
-reboot
-```
-
-```bash
-apt-get install sudo libsss_sudo -y
-control sudo public
-sed -i '19 a\
-sudo_provider = ad' /etc/sssd/sssd.conf
-sed -i 's/services = nss, pam/services = nss, pam, sudo/' /etc/sssd/sssd.conf
-sed -i '28 a\
-sudoers: files sss' /etc/nsswitch.conf
-rm -rf /var/lib/sss/db/*
-sss_cache -E
-systemctl restart sssd
-```
-
-</details>
-
 ## Модуль №2 - Команды для ВМ (Без SAMBA)
 <details>
 <summary> - ISP </summary>
