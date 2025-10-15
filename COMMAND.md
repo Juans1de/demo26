@@ -154,7 +154,23 @@ systemctl enable --now sshd
 apt-get update && apt-get install chrony nfs-server fdisk dnsmasq -y
 timedatectl set-timezone Asia/Yekaterinburg
 systemctl enable --now dnsmasq
-echo -e "no-resolv\ndomain=au-team.irpo\nserver=8.8.8.8\ninterface=ens20\naddress=/hq-rtr.au-team.irpo/192.168.1.1\nptr-record=1.1.168.192.in-addr.arpa,hq-rtr.au-team.irpo\naddress=/docker.au-team.irpo/172.16.1.1\naddress=/web.au-team.irpo/172.16.2.1\naddress=/hq-srv.au-team.irpo/192.168.1.10\nptr-record=10.1.168.192.in-addr.arpa,hq-srv.au-team.irpo\naddress=/hq-cli.au-team.irpo/192.168.2.10\nptr-record=10.2.168.192.in-addr.arpa,hq-cli.au-team.irpo\naddress=/br-rtr.au-team.irpo/192.168.3.1\naddress=/br-srv.au-team.irpo/192.168.3.10" | sudo tee -a /etc/dnsmasq.conf
+cat << EOF >> /etc/dnsmasq.conf
+no-resolv
+domain=au-team.irpo
+server=8.8.8.8
+interface=*
+address=/hq-rtr.au-team.irpo/192.168.1.1
+server=/au-team.irpo/192.168.3.10
+ptr-record=1.1.168.192.in-addr.arpa,hq-rtr.au-team.irpo
+address=/web.au-team.irpo/172.16.1.1
+address=/docker.au-team.irpo/172.16.2.1
+address=/br-rtr.au-team.irpo/192.168.3.1
+address=/hq-srv.au-team.irpo/192.168.1.10
+ptr-record=10.1.168.192.in-addr.arpa,hq-srv.au-team.irpo
+address=/hq-cli.au-team.irpo/192.168.2.10
+ptr-record=10.2.168.192.in-addr.arpa,hq-cli.au-team.irpo
+address=/br-srv.au-team.irpo/192.168.3.10
+EOF
 echo -e "192.168.1.1  hq-rtr.au-team.irpo" >> /etc/hosts
 systemctl restart dnsmasq
 exec bash
