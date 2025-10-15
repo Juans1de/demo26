@@ -181,7 +181,7 @@ gpasswd -a "sshuser" wheel
 sed -i 's/#Port 22/Port 2026\nAllowUsers sshuser\nMaxAuthTries 2\nPasswordAuthentication yes\nBanner \/etc\/openssh\/banner/' /etc/openssh/sshd_config
 echo Authorized access only > /etc/openssh/banner
 systemctl enable --now sshd
-apt-get update && apt-get install chrony nfs-clients admc  -y
+apt-get update && apt-get install chrony nfs-clients admc bind-utils  -y
 timedatectl set-timezone Asia/Yekaterinburg
 timedatectl
 rm -rf /etc/net/ifaces/ens20/{ipv4address,ipv4route}
@@ -278,7 +278,7 @@ gpasswd -a "sshuser" wheel
 sed -i 's/#Port 22/Port 2026\nAllowUsers sshuser\nMaxAuthTries 2\nPasswordAuthentication yes\nBanner \/etc\/openssh\/banner/' /etc/openssh/sshd_config
 echo Authorized access only > /etc/openssh/banner
 systemctl enable --now sshd
-apt-get update && apt-get install chrony docker-compose docker-engine ansible task-samba-dc sshpass  -y
+apt-get update && apt-get install chrony docker-compose docker-engine ansible task-samba-dc sshpass wget dos2unix-y
 timedatectl set-timezone Asia/Yekaterinburg
 timedatectl
 exec bash
@@ -304,37 +304,33 @@ samba-tool user add hquser4 P@ssw0rd
 samba-tool user add hquser5 P@ssw0rd
 samba-tool group add hq
 samba-tool group addmembers hq hquser1,hquser2,hquser3,hquser4,hquser5
-cp /etc/apt/sources.list.d/alt.list /etc/apt/sources.list.d/alt.list.bak
-
-sed -i 's|^rpm.*ftp\.altlinux|# &|g' /etc/apt/sources.list.d/alt.list
-cat >> /etc/apt/sources.list.d/alt.list <<EOF
-rpm http://192.168.0.91/mirror p10/branch/x86_64 classic
-rpm http://192.168.0.91/mirror p10/branch/noarch classic
-rpm http://192.168.0.91/mirror p10/branch/x86_64-586 classic
+wget https://raw.githubusercontent.com/sudo-project/sudo/main/docs/schema.ActiveDirectory
+dos2unix schema.ActiveDirectory
+sed -i 's/DC=X/DC=au-team,DC=irpo/g' schema.ActiveDirectory
+head -$(grep -B1 -n '^dn:$' schema.ActiveDirectory | head -1 | grep -oP '\d+') schema.ActiveDirectory > first.ldif
+tail +$(grep -B1 -n '^dn:$' schema.ActiveDirectory | head -1 | grep -oP '\d+') schema.ActiveDirectory | sed '/^-/d' > second.ldif
+ldbadd -H /var/lib/samba/private/sam.ldb first.ldif --option="dsdb:schema update allowed"=true
+ldbmodify -v -H /var/lib/samba/private/sam.ldb second.ldif --option="dsdb:schema update allowed"=true
+samba-tool ou add 'ou=sudoers'
+cat << EOF > sudoRole-object.ldif
+dn: CN=prava_hq,OU=sudoers,DC=au-team,DC=irpo
+changetype: add
+objectClass: top
+objectClass: sudoRole
+cn: prava_hq
+name: prava_hq
+sudoUser: %hq
+sudoHost: ALL
+sudoCommand: /bin/grep
+sudoCommand: /bin/cat
+sudoCommand: /usr/bin/id
+sudoOption: !authenticate
 EOF
-apt-get update
+ldbadd -H /var/lib/samba/private/sam.ldb sudoRole-object.ldif
+echo -e "dn: CN=prava_hq,OU=sudoers,DC=au-team,DC=irpo\nchangetype: modify\nreplace: nTSecurityDescriptor" > ntGen.ldif
+ldbsearch  -H /var/lib/samba/private/sam.ldb -s base -b 'CN=prava_hq,OU=sudoers,DC=au-team,DC=irpo' 'nTSecurityDescriptor' | sed -n '/^#/d;s/O:DAG:DAD:AI/O:DAG:DAD:AI\(A\;\;RPLCRC\;\;\;AU\)\(A\;\;RPWPCRCCDCLCLORCWOWDSDDTSW\;\;\;SY\)/;3,$p' | sed ':a;N;$!ba;s/\n\s//g' | sed -e 's/.\{78\}/&\n /g' >> ntGen.ldif
+ldbmodify -v -H /var/lib/samba/private/sam.ldb ntGen.ldif
 
-apt-get install sudo-samba-schema -y
-sudo-schema-apply << EOF
-P@ssw0rd
-P@ssw0rd
-EOF
-cat << 'EOF' | sudo sudo-schema-apply --schema-file /dev/stdin --password P@ssw0rd
-<?xml version="1.0" encoding="UTF-8"?>
-<schema>
-  <policy>
-    <name>prava.hq</name>
-    <sudoEntry>
-      <sudoUser>%hq</sudoUser>
-      <sudoHost>ALL</sudoHost>
-      <sudoCommand>/bin/cat</sudoCommand>
-    </sudoEntry>
-  </policy>
-</schema>
-EOF
-
-(Не работает команда)
-echo -e 'P@ssw0rd\n' | create-sudo-rule --rule-name="prava.hq" --sudo-command="/bin/cat" --sudo-user="%hq" --stdin-pass
 ```
 
 </details>
@@ -343,7 +339,22 @@ echo -e 'P@ssw0rd\n' | create-sudo-rule --rule-name="prava.hq" --sudo-command="/
 <summary> - HQ-CLI </summary>
 
 ```bash
-В процессе!
+systemctl restart network
+system-auth write ad AU-TEAM.IRPO cli AU-TEAM 'administrator' 'P@ssw0rd'
+reboot
+```
+
+```bash
+apt-get install sudo libsss_sudo -y
+control sudo public
+sed -i '19 a\
+sudo_provider = ad' /etc/sssd/sssd.conf
+sed -i 's/services = nss, pam/services = nss, pam, sudo/' /etc/sssd/sssd.conf
+sed -i '28 a\
+sudoers: files sss' /etc/nsswitch.conf
+rm -rf /var/lib/sss/db/*
+sss_cache -E
+systemctl restart sssd
 ```
 
 </details>
