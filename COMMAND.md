@@ -25,6 +25,7 @@ systemctl enable --now iptables
 apt-get update && apt-get reinstall tzdata
 timedatectl set-timezone Asia/Yekaterinburg
 timedatectl
+exec bash
 ```
 
 </details>
@@ -156,6 +157,7 @@ systemctl enable --now dnsmasq
 echo -e "no-resolv\ndomain=au-team.irpo\nserver=8.8.8.8\ninterface=ens20\naddress=/hq-rtr.au-team.irpo/192.168.1.1\nptr-record=1.1.168.192.in-addr.arpa,hq-rtr.au-team.irpo\naddress=/docker.au-team.irpo/172.16.1.1\naddress=/web.au-team.irpo/172.16.2.1\naddress=/hq-srv.au-team.irpo/192.168.1.10\nptr-record=10.1.168.192.in-addr.arpa,hq-srv.au-team.irpo\naddress=/hq-cli.au-team.irpo/192.168.2.10\nptr-record=10.2.168.192.in-addr.arpa,hq-cli.au-team.irpo\naddress=/br-rtr.au-team.irpo/192.168.3.1\naddress=/br-srv.au-team.irpo/192.168.3.10" | sudo tee -a /etc/dnsmasq.conf
 echo -e "192.168.1.1  hq-rtr.au-team.irpo" >> /etc/hosts
 systemctl restart dnsmasq
+exec bash
 ```
 
 </details>
@@ -186,6 +188,7 @@ rm -rf /etc/net/ifaces/ens20/{ipv4address,ipv4route}
 echo -e "BOOTPROTO=dhcp\nCONFIG_IPV4=yes\nDISABLED=no\nTYPE=eth" > /etc/net/ifaces/ens20/options
 systemctl restart network
 ip -c a
+exec bash
 ```
 
 </details>
@@ -278,6 +281,7 @@ systemctl enable --now sshd
 apt-get update && apt-get install chrony docker-compose docker-engine ansible task-samba-dc sshpass  -y
 timedatectl set-timezone Asia/Yekaterinburg
 timedatectl
+exec bash
 ```
 
 </details>
