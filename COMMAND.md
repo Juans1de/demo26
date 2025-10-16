@@ -310,7 +310,7 @@ exec bash
 echo -e "server 127.0.0.1 iburst prefer\n\thwtimestamp *\n\tlocal stratum 5\n\tallow 0/0" > /etc/chrony.conf
 systemctl enable --now chronyd
 systemctl restart chronyd
-chronyc sources
+chronyc clients
 chronyc tracking | grep Stratum
 apt-get update && apt-get install apache2-htpasswd -y
 htpasswd -bc /etc/nginx/.htpasswd WEB P@ssw0rd
