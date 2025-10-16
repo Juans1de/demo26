@@ -456,6 +456,7 @@ ip -c a
 ```
 
 ```bash
+sleep 1
 docker compose -f site.yml restart
 ip -c a
 ```
