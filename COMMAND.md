@@ -452,10 +452,18 @@ echo -e 'services:\n  db:\n    image: mariadb\n    container_name: db\n    envir
 docker compose -f site.yml up -d
 sleep 5
 docker exec -it db mysql -u root -pPassw0rd -e "CREATE DATABASE testdb; CREATE USER 'test'@'%' IDENTIFIED BY 'Passw0rd'; GRANT ALL PRIVILEGES ON testdb.* TO 'test'@'%'; FLUSH PRIVILEGES;"
-sleep 2
-docker compose restart
 ip -c a
 ```
+
+</details>
+
+<details> 
+
+```bash
+docker compose -f site.yml restart
+ip -c a
+```
+
 </details>
 
 <details>
