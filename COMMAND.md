@@ -326,6 +326,8 @@ systemctl enable --now nginx
 <summary> - HQ-RTR </summary>
 
 ```bash
+en
+conf t
 ip nat source static tcp 192.168.1.10 80 172.16.1.4 8080
 ip nat source static tcp 192.168.1.10 2026 172.16.1.4 2026
 write
@@ -504,6 +506,8 @@ ip -c a
 <summary> - BR-RTR </summary>
 
 ```bash
+en
+conf t
 ip nat source static tcp 192.168.3.10 8080 172.16.2.5 8080
 ip nat source static tcp 192.168.3.10 2026 172.16.2.5 2026
 write
