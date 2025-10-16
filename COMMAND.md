@@ -455,10 +455,6 @@ docker exec -it db mysql -u root -pPassw0rd -e "CREATE DATABASE testdb; CREATE U
 ip -c a
 ```
 
-</details>
-
-<details> 
-
 ```bash
 docker compose -f site.yml restart
 ip -c a
