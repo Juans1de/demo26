@@ -388,52 +388,6 @@ ip -c a
 </details>
 
 <details>
-<summary> - HQ-CLI </summary>
-
-```bash
-systemctl restart network
-system-auth write ad AU-TEAM.IRPO cli AU-TEAM 'administrator' 'P@ssw0rd'
-reboot
-```
-
-```bash
-apt-get install sudo libsss_sudo -y
-control sudo public
-sed -i '19 a\
-sudo_provider = ad' /etc/sssd/sssd.conf
-sed -i 's/services = nss, pam/services = nss, pam, sudo/' /etc/sssd/sssd.conf
-sed -i '28 a\
-sudoers: files sss' /etc/nsswitch.conf
-rm -rf /var/lib/sss/db/*
-sss_cache -E
-systemctl restart sssd
-mkdir -p /mnt/nfs
-echo "192.168.1.10:/raid/nfs /mnt/nfs nfs intr,soft,_netdev,x-systemd.automount 0 0" >> /etc/fstab
-mount -a
-mount -v
-touch /mnt/nfs
-echo server 172.16.1.1 iburst prefer > /etc/chrony.conf
-systemctl enable --now chronyd
-systemctl restart chronyd
-timedatectl
-apt-get install yandex-browser -y
-ip -c a
-```
-
-</details>
-
-<details>
-<summary> - BR-RTR </summary>
-
-```bash
-ip nat source static tcp 192.168.3.10 8080 172.16.2.5 8080
-ip nat source static tcp 192.168.3.10 2026 172.16.2.5 2026
-write
-```
-
-</details>
-
-<details>
 <summary> - BR-SRV </summary>
 
 ```bash
@@ -501,6 +455,51 @@ docker exec -it db mysql -u root -pPassw0rd -e "CREATE DATABASE testdb; CREATE U
 sleep 2
 docker compose restart
 ip -c a
+```
+</details>
+
+<details>
+<summary> - HQ-CLI </summary>
+
+```bash
+systemctl restart network
+system-auth write ad AU-TEAM.IRPO cli AU-TEAM 'administrator' 'P@ssw0rd'
+reboot
+```
+
+```bash
+apt-get install sudo libsss_sudo -y
+control sudo public
+sed -i '19 a\
+sudo_provider = ad' /etc/sssd/sssd.conf
+sed -i 's/services = nss, pam/services = nss, pam, sudo/' /etc/sssd/sssd.conf
+sed -i '28 a\
+sudoers: files sss' /etc/nsswitch.conf
+rm -rf /var/lib/sss/db/*
+sss_cache -E
+systemctl restart sssd
+mkdir -p /mnt/nfs
+echo "192.168.1.10:/raid/nfs /mnt/nfs nfs intr,soft,_netdev,x-systemd.automount 0 0" >> /etc/fstab
+mount -a
+mount -v
+touch /mnt/nfs
+echo server 172.16.1.1 iburst prefer > /etc/chrony.conf
+systemctl enable --now chronyd
+systemctl restart chronyd
+timedatectl
+apt-get install yandex-browser -y
+ip -c a
+```
+
+</details>
+
+<details>
+<summary> - BR-RTR </summary>
+
+```bash
+ip nat source static tcp 192.168.3.10 8080 172.16.2.5 8080
+ip nat source static tcp 192.168.3.10 2026 172.16.2.5 2026
+write
 ```
 
 </details>
