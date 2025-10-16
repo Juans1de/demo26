@@ -17,7 +17,7 @@ sed -i 's/net.ipv4.ip_forward = 0/net.ipv4.ip_forward = 1/g' /etc/net/sysctl.con
 sysctl -p
 systemctl restart network
 ip -c a
-apt-get update && apt-get install chrony iptables nginx -y
+apt-get update && apt-get install chrony iptables -y
 iptables -t nat -A POSTROUTING -o ens20 -s 172.16.1.0/28 -j MASQUERADE
 iptables -t nat -A POSTROUTING -o ens20 -s 172.16.2.0/28 -j MASQUERADE
 iptables-save > /etc/sysconfig/iptables
@@ -151,7 +151,7 @@ gpasswd -a "sshuser" wheel
 sed -i 's/#Port 22/Port 2026\nAllowUsers sshuser\nMaxAuthTries 2\nPasswordAuthentication yes\nBanner \/etc\/openssh\/banner/' /etc/openssh/sshd_config
 echo Authorized access only > /etc/openssh/banner
 systemctl enable --now sshd
-apt-get update && apt-get install chrony nfs-server fdisk dnsmasq -y
+apt-get update && apt-get install chrony dnsmasq -y
 timedatectl set-timezone Asia/Yekaterinburg
 systemctl enable --now dnsmasq
 cat << EOF >> /etc/dnsmasq.conf
@@ -197,7 +197,7 @@ gpasswd -a "sshuser" wheel
 sed -i 's/#Port 22/Port 2026\nAllowUsers sshuser\nMaxAuthTries 2\nPasswordAuthentication yes\nBanner \/etc\/openssh\/banner/' /etc/openssh/sshd_config
 echo Authorized access only > /etc/openssh/banner
 systemctl enable --now sshd
-apt-get update && apt-get install chrony nfs-clients admc bind-utils  -y
+apt-get update && apt-get install chrony -y
 timedatectl set-timezone Asia/Yekaterinburg
 timedatectl
 rm -rf /etc/net/ifaces/ens20/{ipv4address,ipv4route}
@@ -294,7 +294,7 @@ gpasswd -a "sshuser" wheel
 sed -i 's/#Port 22/Port 2026\nAllowUsers sshuser\nMaxAuthTries 2\nPasswordAuthentication yes\nBanner \/etc\/openssh\/banner/' /etc/openssh/sshd_config
 echo Authorized access only > /etc/openssh/banner
 systemctl enable --now sshd
-apt-get update && apt-get install chrony docker-compose docker-engine ansible task-samba-dc sshpass wget dos2unix -y
+apt-get update && apt-get install chrony -y
 timedatectl set-timezone Asia/Yekaterinburg
 timedatectl
 exec bash
@@ -312,7 +312,7 @@ systemctl enable --now chronyd
 systemctl restart chronyd
 chronyc clients
 chronyc tracking | grep Stratum
-apt-get update && apt-get install apache2-htpasswd -y
+apt-get update && apt-get install nginx apache2-htpasswd -y
 htpasswd -bc /etc/nginx/.htpasswd WEB P@ssw0rd
 echo -e "server {\n\tlisten 80;\n\tserver_name web.au-team.irpo;\n\tauth_basic \"Restricted Access\";\n\tauth_basic_user_file /etc/nginx/.htpasswd;\n\tlocation / {\n\t\tproxy_pass http://172.16.1.4:8080;\n\t\tproxy_set_header Host \$host;\n\t\tproxy_set_header X-Real-IP \$remote_addr;\n\t}\n}\nserver {\n\tlisten 80;\n\tserver_name docker.au-team.irpo;\n\tlocation / {\n\t\tproxy_pass http://172.16.2.5:8080;\n\t\tproxy_set_header Host \$host;\n\t\tproxy_set_header X-Real-IP \$remote_addr;\n\t}\n}" > /etc/nginx/sites-available.d/proxy.conf
 ln -s /etc/nginx/sites-available.d/proxy.conf /etc/nginx/sites-enabled.d/
@@ -337,6 +337,7 @@ write
 <summary> - HQ-SRV </summary>
 
 ```bash
+apt-get update && apt-get install fdisk nfs-server -y
 lsblk
 mdadm --create /dev/md0 --level=0 --raid-devices=2 /dev/sd[b-c]
 mdadm --detail -scan --verbose > /etc/mdadm.conf
@@ -391,6 +392,7 @@ ip -c a
 <summary> - BR-SRV </summary>
 
 ```bash
+apt-get update && apt-get install docker-compose docker-engine ansible task-samba-dc sshpass wget dos2unix -y
 echo nameserver 192.168.1.10 > /etc/resolv.conf
 rm -rf /etc/samba/smb.conf
 echo 192.168.3.10  br-srv.au-team.irpo >> /etc/hosts
@@ -473,7 +475,7 @@ reboot
 ```
 
 ```bash
-apt-get install sudo libsss_sudo -y
+apt-get install nfs-clients admc bind-utils sudo libsss_sudo -y
 control sudo public
 sed -i '19 a\
 sudo_provider = ad' /etc/sssd/sssd.conf
