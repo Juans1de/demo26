@@ -302,7 +302,7 @@ exec bash
 
 </details>
 
-## Модуль №2 - Команды для ВМ (Без SAMBA)
+## Модуль №2 - Команды для ВМ
 <details>
 <summary> - ISP </summary>
 
