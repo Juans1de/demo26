@@ -294,7 +294,7 @@ gpasswd -a "sshuser" wheel
 sed -i 's/#Port 22/Port 2026\nAllowUsers sshuser\nMaxAuthTries 2\nPasswordAuthentication yes\nBanner \/etc\/openssh\/banner/' /etc/openssh/sshd_config
 echo Authorized access only > /etc/openssh/banner
 systemctl enable --now sshd
-apt-get update && apt-get install chrony docker-compose docker-engine ansible task-samba-dc sshpass wget dos2unix-y
+apt-get update && apt-get install chrony docker-compose docker-engine ansible task-samba-dc sshpass wget dos2unix -y
 timedatectl set-timezone Asia/Yekaterinburg
 timedatectl
 exec bash
