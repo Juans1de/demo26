@@ -337,6 +337,19 @@ write
 </details>
 
 <details>
+<summary> - BR-RTR </summary>
+
+```bash
+en
+conf t
+ip nat source static tcp 192.168.3.10 8080 172.16.2.5 8080
+ip nat source static tcp 192.168.3.10 2026 172.16.2.5 2026
+write
+```
+
+</details>
+
+<details>
 <summary> - HQ-SRV </summary>
 
 ```bash
@@ -499,19 +512,6 @@ systemctl restart chronyd
 timedatectl
 apt-get install yandex-browser -y
 ip -c a
-```
-
-</details>
-
-<details>
-<summary> - BR-RTR </summary>
-
-```bash
-en
-conf t
-ip nat source static tcp 192.168.3.10 8080 172.16.2.5 8080
-ip nat source static tcp 192.168.3.10 2026 172.16.2.5 2026
-write
 ```
 
 </details>
