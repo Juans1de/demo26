@@ -1,5 +1,6 @@
 # Demo 2026 (M1 & M2)
 ## Модуль №1 - Команды для ВМ
+
 <details>
 <summary> - ISP </summary>
 
@@ -17,13 +18,6 @@ sed -i 's/net.ipv4.ip_forward = 0/net.ipv4.ip_forward = 1/g' /etc/net/sysctl.con
 sysctl -p
 systemctl restart network
 ip -c a
-cp /etc/apt/sources.list.d/alt.list /etc/apt/sources.list.d/alt.list.bak
-sed -i 's|^rpm.*ftp\.altlinux|# &|g' /etc/apt/sources.list.d/alt.list
-cat >> /etc/apt/sources.list.d/alt.list <<EOF
-rpm [p11] http://192.168.0.222/mirror p11/branch/x86_64 classic
-rpm [p11] http://192.168.0.222/mirror p11/branch/noarch classic
-rpm [p11] http://192.168.0.222/mirror p11/branch/x86_64-i586 classic
-EOF
 apt-get update && apt-get install chrony iptables -y
 iptables -t nat -A POSTROUTING -o ens20 -s 172.16.1.0/28 -j MASQUERADE
 iptables -t nat -A POSTROUTING -o ens20 -s 172.16.2.0/28 -j MASQUERADE
@@ -316,13 +310,6 @@ gpasswd -a "sshuser" wheel
 sed -i 's/#Port 22/Port 2026\nAllowUsers sshuser\nMaxAuthTries 2\nPasswordAuthentication yes\nBanner \/etc\/openssh\/banner/' /etc/openssh/sshd_config
 echo Authorized access only > /etc/openssh/banner
 systemctl enable --now sshd
-cp /etc/apt/sources.list.d/alt.list /etc/apt/sources.list.d/alt.list.bak
-sed -i 's|^rpm.*ftp\.altlinux|# &|g' /etc/apt/sources.list.d/alt.list
-cat >> /etc/apt/sources.list.d/alt.list <<EOF
-rpm [p10] http://192.168.0.222/mirror p10/branch/x86_64 classic
-rpm [p10] http://192.168.0.222/mirror p10/branch/noarch classic
-rpm [p10] http://192.168.0.222/mirror p10/branch/x86_64-i586 classic
-EOF
 apt-get update && apt-get install chrony -y
 timedatectl set-timezone Asia/Yekaterinburg
 timedatectl
@@ -540,6 +527,35 @@ systemctl restart chronyd
 timedatectl
 apt-get install yandex-browser -y
 ip -c a
+```
+
+## Замена репозитория
+</details>
+<summary> - ISP </summary>
+
+```bash
+cp /etc/apt/sources.list.d/alt.list /etc/apt/sources.list.d/alt.list.bak
+sed -i 's|^rpm.*ftp\.altlinux|# &|g' /etc/apt/sources.list.d/alt.list
+cat >> /etc/apt/sources.list.d/alt.list <<EOF
+rpm [p11] http://192.168.0.222/mirror p11/branch/x86_64 classic
+rpm [p11] http://192.168.0.222/mirror p11/branch/noarch classic
+rpm [p11] http://192.168.0.222/mirror p11/branch/x86_64-i586 classic
+EOF
+```
+
+</details>
+
+<details>
+<summary> - </summary>
+
+```bash
+cp /etc/apt/sources.list.d/alt.list /etc/apt/sources.list.d/alt.list.bak
+sed -i 's|^rpm.*ftp\.altlinux|# &|g' /etc/apt/sources.list.d/alt.list
+cat >> /etc/apt/sources.list.d/alt.list <<EOF
+rpm [p10] http://192.168.0.222/mirror p10/branch/x86_64 classic
+rpm [p10] http://192.168.0.222/mirror p10/branch/noarch classic
+rpm [p10] http://192.168.0.222/mirror p10/branch/x86_64-i586 classic
+EOF
 ```
 
 </details>
