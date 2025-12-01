@@ -378,28 +378,21 @@ echo server 172.16.1.1 iburst prefer > /etc/chrony.conf
 systemctl enable --now chronyd
 timedatectl
 apt-get update
-apt-get install -y apache2 php8.2 apache2-mod_php8.2 mariadb-server php8.2-{opcache,curl,gd,intl,mysqli,xml,xmlrpc,ldap,zip,soap,mbstring,json,xmlreader,fileinfo,sodium}
+apt-get install lamp-server -y
 mount -o loop /dev/sr0
-systemctl enable --now httpd2 mysqld
-echo -e "\ny\nP@ssw0rd\nP@ssw0rd\ny\ny\ny\ny" > mysql_secure_installation_answers.txt
-sudo mysql_secure_installation < mysql_secure_installation_answers.txt
-mariadb -u root -pP@ssw0rd
-CREATE DATABASE webdb;
-CREATE USER 'webc'@'localhost' IDENTIFIED BY 'P@ssw0rd';
-GRANT ALL PRIVILEGES ON webdb.* TO 'webc'@'localhost';
-FLUSH PRIVILEGES;
-EXIT;
-iconv -f UTF-16LE -t UTF-8 /media/ALTLinux/web/dump.sql > /tmp/dump_utf8.sql
-mariadb -u root -pP@ssw0rd webdb < /tmp/dump_utf8.sql
-chmod 777 /var/www/html
-cp /media/ALTLinux/web/index.php /var/www/html
-cp /media/ALTLinux/web/logo.png /var/www/html
-rm -f /var/www/html/index.html
-chown apache2:apache2 /var/www/html
-systemctl restart httpd2
+cp /mnt/web/index.php /var/www/html
+cp /mnt/web/logo.png /var/www/html
 sed -i 's/$username = "user";/$username = "webc";/g' /var/www/html/index.php
 sed -i 's/$password = "password";/$password = "P@ssw0rd";/g' /var/www/html/index.php
 sed -i 's/$dbname = "db";/$dbname = "webdb";/g' /var/www/html/index.php
+systemctl enable --now mariadb
+mariadb -u root
+CREATE DATABASE webdb;
+CREATE USER 'webc'@'localhost' IDENTIFIED BY 'P@ssw0rd';
+GRANT ALL PRIVILEGES ON webdb.* TO 'webc'@'localhost' WITH GRANT OPTION;
+EXIT;
+mariadb -u root -p -D webdb < /tmp/dump.sql
+systemctl enable --now httpd2
 ip -c a
 ```
 
@@ -409,7 +402,7 @@ ip -c a
 <summary> - BR-SRV </summary>
 
 ```bash
-apt-get update && apt-get install docker-compose docker-engine ansible task-samba-dc sshpass wget dos2unix -y
+apt-get update && apt-get install docker-compose docker-engine-v2 ansible task-samba-dc sshpass wget dos2unix -y
 echo nameserver 192.168.1.10 > /etc/resolv.conf
 rm -rf /etc/samba/smb.conf
 echo 192.168.3.10  br-srv.au-team.irpo >> /etc/hosts
@@ -467,16 +460,8 @@ sleep 2
 docker load < /media/ALTLinux/docker/mariadb_latest.tar
 sleep 2
 docker images
-echo -e 'services:\n  db:\n    image: mariadb\n    container_name: db\n    environment:\n      MYSQL_ROOT_PASSWORD: Passw0rd\n      MYSQL_DATABASE: testdb\n      MYSQL_USER: test\n      MYSQL_PASSWORD: Passw0rd\n    volumes:\n      - db_data:/var/lib/mysql\n    restart: always\n  testapp:\n    image: site\n    container_name: testapp\n    environment:\n      DB_TYPE: maria\n      DB_HOST: db\n      DB_NAME: testdb\n      DB_USER: test\n      DB_PASS: Passw0rd\n      DB_PORT: 3306\n    ports:\n      - "8080:8000"\n    restart: always\nvolumes:\n  db_data:' > site.yml
+echo -e 'services:\n  db:\n    image: mariadb:10.11\n    container_name: db\n    environment:\n      MARIADB_ROOT_PASSWORD: "toor"\n      MARIADB_DATABASE: "testdb"\n      MARIADB_USER: "testc"\n      MARIADB_PASSWORD: "P@ssw0rd"\n    ports:\n      - "3306:3306"\n    restart: always\n  testapp:\n    image: site:latest\n    container_name: testapp\n    environment:\n      DB_TYPE: "maria"\n      DB_HOST: "192.168.3.10"\n      DB_NAME: "testdb"\n      DB_USER: "testc"\n      DB_PASS: "P@ssw0rd"\n      DB_PORT: "3306"\n    ports:\n      - "8080:8000"\n    restart: always\n    depends_on:\n      - db' > site.yml
 docker compose -f site.yml up -d
-sleep 5
-docker exec -it db mysql -u root -pPassw0rd -e "CREATE DATABASE testdb; CREATE USER 'test'@'%' IDENTIFIED BY 'Passw0rd'; GRANT ALL PRIVILEGES ON testdb.* TO 'test'@'%'; FLUSH PRIVILEGES;"
-ip -c a
-```
-
-```bash
-sleep 1
-docker compose -f site.yml restart
 ip -c a
 ```
 
