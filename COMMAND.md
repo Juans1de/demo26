@@ -391,7 +391,7 @@ CREATE DATABASE webdb;
 CREATE USER 'webc'@'localhost' IDENTIFIED BY 'P@ssw0rd';
 GRANT ALL PRIVILEGES ON webdb.* TO 'webc'@'localhost' WITH GRANT OPTION;
 EXIT;
-mariadb -u root -p -D webdb < /tmp/dump.sql
+mariadb -u webc -pP@ssw0rd -D webdb < /tmp/dump.sql
 systemctl enable --now httpd2
 ip -c a
 ```
