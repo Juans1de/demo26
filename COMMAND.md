@@ -381,8 +381,8 @@ apt-get update
 apt-get install lamp-server -y
 sleep 2
 mount -o loop /dev/sr0
-cp /mnt/web/index.php /var/www/html
-cp /mnt/web/logo.png /var/www/html
+cp /media/ALTLinux/web/index.php /var/www/html
+cp /media/ALTLinux/web/logo.png /var/www/html
 sleep 2
 sed -i 's/$username = "user";/$username = "webc";/g' /var/www/html/index.php
 sed -i 's/$password = "password";/$password = "P@ssw0rd";/g' /var/www/html/index.php
