@@ -402,7 +402,7 @@ ip -c a
 <summary> - BR-SRV </summary>
 
 ```bash
-apt-get update && apt-get install docker-compose docker-engine-v2 ansible task-samba-dc sshpass wget dos2unix -y
+apt-get update && apt-get install docker-compose docker-engine ansible task-samba-dc sshpass wget dos2unix -y
 echo nameserver 192.168.1.10 > /etc/resolv.conf
 rm -rf /etc/samba/smb.conf
 echo 192.168.3.10  br-srv.au-team.irpo >> /etc/hosts
