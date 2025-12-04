@@ -505,3 +505,92 @@ apt-get install yandex-browser -y
 ip -c a
 ```
 <details/>
+
+## Модуль №3 - Команды для ВМ
+
+<details> 
+<summary> - HQ-SRV (Задание №2) </summary>
+openssl req -newkey rsa:4096 -nodes -keyout ca.key -x509 -days 365 -out ca.crt \
+-subj "/C=BY/ST=HMAO/L=RADUZHNY/O=AU-Team CA/OU=408"
+openssl genrsa -out web.key 4096
+openssl req -key web.key -new -out web.csr \
+-subj "/C=BY/ST=HMAO/L=RADUZHNY/O=au-team.irpo/OU=408" \
+-passin pass:P@ssw0rd
+cat > openssl.cnf << 'EOF'
+[req]
+req_extensions = req_ext
+
+[req_ext]
+subjectAltName = DNS:web.au-team.irpo, DNS:docker.au-team.irpo
+extendedKeyUsage = serverAuth
+keyUsage = digitalSignature
+EOF
+openssl x509 -req -in web.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out web.crt -days 365 -sha256 -extfile openssl.cnf -extensions req_ext
+ls -l
+<details/>
+
+<details>
+<summary> - ISP </summary>
+useradd sshuser
+echo "sshuser:P@ssw0rd" | chpasswd
+sed -i 's/#Port 22/Port 22/g' /etc/openssh/sshd_config
+systemctl enable --now sshd
+systemctl restart sshd
+</details>
+
+<details>
+<summary> - HQ-SRV </summary>
+/usr/bin/expect << 'EOF'
+set timeout 30
+spawn scp web.crt web.key sshuser@172.16.1.1:/home/sshuser/
+expect {
+    "yes/no" { send "yes\r"; exp_continue }
+    "password:" { send "P@ssw0rd\r" }
+}
+expect eof
+EOF
+</details>
+
+<details> 
+<summary> - HQ-SRV </summary>
+mkdir /etc/nginx/ssl
+mv /home/sshuser/web.crt /etc/nginx/ssl
+mv /home/sshuser/web.key /etc/nginx/ssl
+chmod 777 /etc/nginx/ssl/web.key
+cat > /etc/nginx/sites-available.d/proxy.conf << EOF
+server {
+    listen 80;
+    server_name docker.au-team.irpo web.au-team.irpo;
+    return 301 https://\$host;
+}
+
+server {
+    listen 443 ssl;
+    server_name docker.au-team.irpo;
+    ssl_certificate /etc/nginx/ssl/web.crt;
+    ssl_certificate_key $SSL_KEY;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    location / {
+        proxy_pass http://$UPSTREAM1;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name $DOMAIN2;
+    add_header Content-Security-Policy "upgrade-insecure-requests" always;
+    ssl_certificate $SSL_CERT;
+    ssl_certificate_key $SSL_KEY;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    auth_basic "Restricted Access";
+    auth_basic_user_file /etc/nginx/.htpasswd;
+    location / {
+        proxy_pass http://172.16.2.5:8080;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+    }
+}
+EOF
+</details>
