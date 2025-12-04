@@ -550,7 +550,7 @@ extendedKeyUsage = serverAuth
 keyUsage = digitalSignature
 EOF
 sleep 2
-openssl x509 -req -in web.csr -CA ca.crt -CAkey ca.key -CAcreateserial /
+openssl x509 -req -in web.csr -CA ca.crt -CAkey ca.key -CAcreateserial \
 -out web.crt -days 365 -sha256 -extfile openssl.cnf -extensions req_ext
 ls -l
 ```
