@@ -633,16 +633,6 @@ systemctl restart nginx
 
 </details>
 
-<details> 
-<summary> - HQ-CLI </summary>
-
-```bash
-su -
-systemctl restart network
-```
-
-</details>
-
 <details>
 <summary> - HQ-SRV </summary>
 
@@ -664,6 +654,7 @@ EOF
 <summary> - HQ-CLI </summary>
 
 ```bash
+systemctl restart network
 mkdir -p /etc/pki/ca-trust/source/anchors/
 cp /tmp/ca.crt /etc/pki/ca-trust/source/anchors/au-team-ca.crt
 update-ca-trust
