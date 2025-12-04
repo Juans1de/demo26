@@ -316,7 +316,29 @@ chronyc clients
 chronyc tracking | grep Stratum
 apt-get update && apt-get install nginx apache2-htpasswd -y
 htpasswd -bc /etc/nginx/.htpasswd WEB P@ssw0rd
-echo -e "server {\n\tlisten 80;\n\tserver_name web.au-team.irpo;\n\tauth_basic \"Restricted Access\";\n\tauth_basic_user_file /etc/nginx/.htpasswd;\n\tlocation / {\n\t\tproxy_pass http://172.16.2.5:8080;\n\t\tproxy_set_header Host \$host;\n\t\tproxy_set_header X-Real-IP \$remote_addr;\n\t}\n}\nserver {\n\tlisten 80;\n\tserver_name docker.au-team.irpo;\n\tlocation / {\n\t\tproxy_pass http://172.16.1.4:8080;\n\t\tproxy_set_header Host \$host;\n\t\tproxy_set_header X-Real-IP \$remote_addr;\n\t}\n}" > /etc/nginx/sites-available.d/proxy.conf
+cat > /etc/nginx/sites-available.d/proxy.conf << EOF
+server {
+    listen 80;
+    server_name docker.au-team.irpo;
+    location / {
+        proxy_pass http://172.16.1.4:8080;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+    }
+}
+
+server {
+    listen 80;
+    server_name web.au-team.irpo;
+    auth_basic "Restricted Access";
+    auth_basic_user_file /etc/nginx/.htpasswd;
+    location / {
+        proxy_pass http://172.16.2.5:8080;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+    }
+}
+EOF
 ln -s /etc/nginx/sites-available.d/proxy.conf /etc/nginx/sites-enabled.d/
 mv /etc/nginx/sites-available.d/default.conf /root/
 systemctl enable --now nginx
@@ -504,12 +526,12 @@ timedatectl
 apt-get install yandex-browser -y
 ip -c a
 ```
-<details/>
+</details>
 
 ## Модуль №3 - Команды для ВМ
-
 <details> 
 <summary> - HQ-SRV (Задание №2) </summary>
+```
 openssl req -newkey rsa:4096 -nodes -keyout ca.key -x509 -days 365 -out ca.crt \
 -subj "/C=BY/ST=HMAO/L=RADUZHNY/O=AU-Team CA/OU=408"
 openssl genrsa -out web.key 4096
@@ -527,19 +549,23 @@ keyUsage = digitalSignature
 EOF
 openssl x509 -req -in web.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out web.crt -days 365 -sha256 -extfile openssl.cnf -extensions req_ext
 ls -l
+```
 <details/>
 
 <details>
 <summary> - ISP </summary>
+```
 useradd sshuser
 echo "sshuser:P@ssw0rd" | chpasswd
 sed -i 's/#Port 22/Port 22/g' /etc/openssh/sshd_config
 systemctl enable --now sshd
 systemctl restart sshd
+```
 </details>
 
 <details>
 <summary> - HQ-SRV </summary>
+```
 /usr/bin/expect << 'EOF'
 set timeout 30
 spawn scp web.crt web.key sshuser@172.16.1.1:/home/sshuser/
@@ -549,10 +575,12 @@ expect {
 }
 expect eof
 EOF
+```
 </details>
 
 <details> 
 <summary> - HQ-SRV </summary>
+```
 mkdir /etc/nginx/ssl
 mv /home/sshuser/web.crt /etc/nginx/ssl
 mv /home/sshuser/web.key /etc/nginx/ssl
@@ -568,10 +596,10 @@ server {
     listen 443 ssl;
     server_name docker.au-team.irpo;
     ssl_certificate /etc/nginx/ssl/web.crt;
-    ssl_certificate_key $SSL_KEY;
+    ssl_certificate_key /etc/nginx/ssl/web.key;
     ssl_protocols TLSv1.2 TLSv1.3;
     location / {
-        proxy_pass http://$UPSTREAM1;
+        proxy_pass http://172.16.1.4:8080;
         proxy_set_header Host \$host;
         proxy_set_header X-Real-IP \$remote_addr;
     }
@@ -579,10 +607,10 @@ server {
 
 server {
     listen 443 ssl;
-    server_name $DOMAIN2;
+    server_name web.au-team.irpo;
     add_header Content-Security-Policy "upgrade-insecure-requests" always;
-    ssl_certificate $SSL_CERT;
-    ssl_certificate_key $SSL_KEY;
+    ssl_certificate /etc/nginx/ssl/web.crt;
+    ssl_certificate_key /etc/nginx/ssl/web.key;
     ssl_protocols TLSv1.2 TLSv1.3;
     auth_basic "Restricted Access";
     auth_basic_user_file /etc/nginx/.htpasswd;
@@ -593,4 +621,10 @@ server {
     }
 }
 EOF
+```
+systemctl restart nginx
+</details>
+
+<details> 
+
 </details>
