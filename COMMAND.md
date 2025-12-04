@@ -529,8 +529,9 @@ ip -c a
 </details>
 
 ## Модуль №3 - Команды для ВМ
+### Задание №2
 <details> 
-<summary> - HQ-SRV (Задание №2) </summary>
+<summary> - HQ-SRV </summary>
     
 ```bash
 openssl req -newkey rsa:4096 -nodes -keyout ca.key -x509 -days 365 -out ca.crt \
