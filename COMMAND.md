@@ -531,7 +531,8 @@ ip -c a
 ## Модуль №3 - Команды для ВМ
 <details> 
 <summary> - HQ-SRV (Задание №2) </summary>
-```
+    
+```bash
 openssl req -newkey rsa:4096 -nodes -keyout ca.key -x509 -days 365 -out ca.crt \
 -subj "/C=BY/ST=HMAO/L=RADUZHNY/O=AU-Team CA/OU=408"
 openssl genrsa -out web.key 4096
@@ -550,11 +551,13 @@ EOF
 openssl x509 -req -in web.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out web.crt -days 365 -sha256 -extfile openssl.cnf -extensions req_ext
 ls -l
 ```
+
 <details/>
 
 <details>
 <summary> - ISP </summary>
-```
+    
+```bash
 useradd sshuser
 echo "sshuser:P@ssw0rd" | chpasswd
 sed -i 's/#Port 22/Port 22/g' /etc/openssh/sshd_config
@@ -565,7 +568,8 @@ systemctl restart sshd
 
 <details>
 <summary> - HQ-SRV </summary>
-```
+
+```bash
 /usr/bin/expect << 'EOF'
 set timeout 30
 spawn scp web.crt web.key sshuser@172.16.1.1:/home/sshuser/
@@ -576,11 +580,13 @@ expect {
 expect eof
 EOF
 ```
+    
 </details>
 
 <details> 
 <summary> - HQ-SRV </summary>
-```
+    
+```bash
 mkdir /etc/nginx/ssl
 mv /home/sshuser/web.crt /etc/nginx/ssl
 mv /home/sshuser/web.key /etc/nginx/ssl
@@ -621,10 +627,47 @@ server {
     }
 }
 EOF
-```
 systemctl restart nginx
+```
+
 </details>
 
 <details> 
+<summary> - HQ-CLI </summary>
+
+```bash
+su -
+systemctl restart network
+```
+
+</details>
+
+<details>
+<summary> - HQ-SRV </summary>
+
+```bash
+/usr/bin/expect << 'EOF'
+set timeout 30
+spawn scp web.crt web.key sshuser@172.16.1.1:/home/sshuser/
+expect {
+    "yes/no" { send "yes\r"; exp_continue }
+    "password:" { send "P@ssw0rd\r" }
+}
+expect eof
+EOF
+```
+
+</details>
+
+<details> 
+<summary> - HQ-CLI </summary>
+
+```bash
+mkdir -p /etc/pki/ca-trust/source/anchors/
+cp /tmp/ca.crt /etc/pki/ca-trust/source/anchors/au-team-ca.crt
+update-ca-trust
+trustlist | grep -i "au-team"
+ip -c a
+```
 
 </details>
