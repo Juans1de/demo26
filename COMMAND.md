@@ -534,7 +534,7 @@ ip -c a
 <summary> - HQ-SRV </summary>
     
 ```bash
-openssl req -newkey rsa:4096 -nodes -keyout ca.key -x509 -days 365 -out ca.crt
+openssl req -newkey rsa:4096 -nodes -keyout ca.key -x509 -days 365 -out ca.crt \
 -subj "/C=BY/ST=RADUZHNY/L=HMAO/O=408/CN=AU-Team CA"
 openssl genrsa -out web.key 4096
 openssl req -key web.key -new -out web.csr \
