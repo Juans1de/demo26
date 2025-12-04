@@ -534,11 +534,11 @@ ip -c a
 <summary> - HQ-SRV </summary>
     
 ```bash
-openssl req -newkey rsa:4096 -nodes -keyout ca.key -x509 -days 365 -out ca.crt \
--subj "/C=BY/ST=HMAO/L=RADUZHNY/O=AU-Team CA/OU=408"
+openssl req -newkey rsa:4096 -nodes -keyout ca.key -x509 -days 365 -out ca.crt
+-subj "/C=BY/ST=RADUZHNY/L=HMAO/O=408/CN=AU-Team CA"
 openssl genrsa -out web.key 4096
 openssl req -key web.key -new -out web.csr \
--subj "/C=BY/ST=HMAO/L=RADUZHNY/O=au-team.irpo/OU=408" \
+-subj "/C=BY/ST=HMAO/L=RADUZHNY/O=au-team.irpo/OU=408/CN=au-team.irpo" \
 -passin pass:P@ssw0rd
 cat > openssl.cnf << 'EOF'
 [req]
