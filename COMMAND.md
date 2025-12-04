@@ -658,7 +658,7 @@ systemctl restart network
 mkdir -p /etc/pki/ca-trust/source/anchors/
 cp /tmp/ca.crt /etc/pki/ca-trust/source/anchors/au-team-ca.crt
 update-ca-trust
-trustlist | grep -i "au-team"
+trust list | grep -i "au-team"
 ip -c a
 ```
 
