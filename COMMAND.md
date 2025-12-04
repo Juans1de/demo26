@@ -552,7 +552,7 @@ openssl x509 -req -in web.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out web.
 ls -l
 ```
 
-<details/>
+</details>
 
 <details>
 <summary> - ISP </summary>
