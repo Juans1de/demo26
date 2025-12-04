@@ -639,7 +639,7 @@ systemctl restart nginx
 ```bash
 /usr/bin/expect << 'EOF'
 set timeout 30
-spawn scp web.crt web.key sshuser@172.16.1.1:/home/sshuser/
+spawn scp -P 2026 ca.crt sshuser@192.168.2.10:/tmp
 expect {
     "yes/no" { send "yes\r"; exp_continue }
     "password:" { send "P@ssw0rd\r" }
