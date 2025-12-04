@@ -585,7 +585,7 @@ EOF
 </details>
 
 <details> 
-<summary> - HQ-SRV </summary>
+<summary> - ISP </summary>
     
 ```bash
 mkdir /etc/nginx/ssl
